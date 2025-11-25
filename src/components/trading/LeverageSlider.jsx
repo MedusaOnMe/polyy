@@ -14,9 +14,9 @@ export function LeverageSlider({ value, onChange }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <label className="text-xs text-text-secondary">Leverage</label>
-        <span className="text-sm font-bold text-accent-blue">{value}x</span>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="text-[10px] text-term-text-dim uppercase">Leverage</label>
+        <span className="text-xs font-bold text-term-green term-glow">{value}x</span>
       </div>
 
       {/* Slider */}
@@ -27,20 +27,20 @@ export function LeverageSlider({ value, onChange }) {
           max="100"
           value={sliderValue}
           onChange={handleSliderChange}
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+          className="w-full h-1 appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #58a6ff 0%, #58a6ff ${sliderValue}%, #30363d ${sliderValue}%, #30363d 100%)`,
+            background: `linear-gradient(to right, #00ff41 0%, #00ff41 ${sliderValue}%, #2a2a2a ${sliderValue}%, #2a2a2a 100%)`,
           }}
         />
 
         {/* Tick marks */}
-        <div className="flex justify-between mt-1 px-1">
+        <div className="flex justify-between mt-1 px-0.5">
           {LEVERAGE_OPTIONS.filter((_, i) => i % 2 === 0 || i === LEVERAGE_OPTIONS.length - 1).map((lev) => (
             <button
               key={lev}
               onClick={() => onChange(lev)}
               className={`text-[10px] transition-colors ${
-                value === lev ? 'text-accent-blue font-medium' : 'text-text-secondary hover:text-text-primary'
+                value === lev ? 'text-term-green font-medium' : 'text-term-text-dim hover:text-term-text'
               }`}
             >
               {lev}x
@@ -50,15 +50,15 @@ export function LeverageSlider({ value, onChange }) {
       </div>
 
       {/* Quick select buttons */}
-      <div className="flex gap-1.5 mt-3">
+      <div className="flex gap-1 mt-2">
         {[1, 5, 10, 15, 20, 25].map((lev) => (
           <button
             key={lev}
             onClick={() => onChange(lev)}
-            className={`flex-1 py-1.5 text-xs font-medium rounded transition-colors ${
+            className={`flex-1 py-1 text-[10px] font-medium transition-colors ${
               value === lev
-                ? 'bg-accent-blue text-white'
-                : 'bg-tertiary text-text-secondary hover:text-text-primary hover:bg-border'
+                ? 'bg-term-green/20 text-term-green border border-term-green'
+                : 'bg-term-gray text-term-text-dim hover:text-term-text border border-term-border hover:border-term-green/50'
             }`}
           >
             {lev}x

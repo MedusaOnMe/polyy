@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { X } from 'lucide-react'
 
 export function Modal({ isOpen, onClose, title, children, size = 'md' }) {
-  // Close on escape key
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose()
@@ -37,24 +36,24 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }) {
       />
 
       {/* Modal content */}
-      <div
-        className={`relative w-full ${sizes[size]} bg-secondary border border-border rounded-xl shadow-2xl animate-slide-up`}
-      >
+      <div className={`relative w-full ${sizes[size]} bg-term-dark border border-term-border shadow-2xl`}>
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-            <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-term-border">
+            <h2 className="text-xs text-term-green uppercase tracking-wider">
+              &gt; {title}
+            </h2>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-tertiary transition-colors"
+              className="p-1 hover:bg-term-gray transition-colors text-term-text-dim hover:text-term-red"
             >
-              <X className="w-5 h-5 text-text-secondary" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
 
         {/* Body */}
-        <div className="p-6">
+        <div className="p-4">
           {children}
         </div>
       </div>

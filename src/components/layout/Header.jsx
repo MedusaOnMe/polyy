@@ -1,32 +1,36 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, LogOut, User, Menu, X, DollarSign, Plus, Key, Eye, EyeOff, Copy, AlertTriangle } from 'lucide-react'
+import { LogOut, User, Menu, X, Plus, Key, Eye, EyeOff, Copy, AlertTriangle, ChevronDown, BarChart3 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { Button } from '../ui/Button'
+import { useMarket } from '../../context/MarketContext'
 import { AuthModal } from '../auth/AuthModal'
+import { MarketsModal } from '../trading/MarketsModal'
 import { Modal } from '../ui/Modal'
 import { useToast } from '../../context/ToastContext'
-
-// X (Twitter) icon
-function XIcon({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  )
-}
+import { formatCents } from '../../utils/formatters'
 
 export function Header() {
   const { user, isAuthenticated, logout, exportPrivateKey } = useAuth()
+  const { selectedMarket } = useMarket()
   const toast = useToast()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
+  const [showMarketsModal, setShowMarketsModal] = useState(false)
   const [exportPassword, setExportPassword] = useState('')
   const [revealedKey, setRevealedKey] = useState('')
   const [showKey, setShowKey] = useState(false)
+
+  // Close markets modal on ESC
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setShowMarketsModal(false)
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [])
 
   const handleExportKey = async () => {
     try {
@@ -51,119 +55,163 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-secondary border-b border-border sticky top-0 z-40">
-        <div className="px-4 py-3">
+      <header className="bg-term-dark border-b border-term-border sticky top-0 z-40">
+        <div className="px-4 py-2">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-8">
-              <Link to="/" className="flex items-center gap-2">
-                <img src="/logo.png" alt="PolyPerps" className="w-8 h-8" />
-                <span className="text-xl font-bold text-white">PolyPerps</span>
+            {/* Left side: Logo + Nav + Markets */}
+            <div className="flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2 mr-2">
+                <div className="text-term-green text-lg font-bold tracking-tight term-glow">
+                  <span className="text-term-text-dim">[</span>
+                  POLYNOMIAL
+                  <span className="text-term-text-dim">]</span>
+                </div>
               </Link>
 
-              {/* Desktop Nav */}
-              <nav className="hidden md:flex items-center gap-6">
-                <Link to="/" className="text-sm font-medium text-text-primary hover:text-accent-blue transition-colors">
-                  Trade
+              {/* Nav Links - right next to logo */}
+              <nav className="hidden md:flex items-center">
+                <Link to="/" className="px-2.5 py-1.5 text-xs text-term-text-dim hover:text-term-green transition-colors">
+                  TERMINAL
                 </Link>
-                <Link to="/docs" className="text-sm font-medium text-text-secondary hover:text-accent-blue transition-colors">
-                  Docs
+                <Link to="/docs" className="px-2.5 py-1.5 text-xs text-term-text-dim hover:text-term-green transition-colors">
+                  ABOUT
                 </Link>
-                <a href="https://x.com/PolyPerpetuals" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-text-primary transition-colors">
-                  <XIcon className="w-4 h-4" />
+                <a
+                  href="https://x.com/PolyPerpetuals"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1.5 text-xs text-term-text-dim hover:text-term-green transition-colors"
+                >
+                  X
                 </a>
               </nav>
+
+              {/* Divider */}
+              <div className="hidden md:block w-px h-5 bg-term-border mx-2" />
+
+              {/* Markets Button - More prominent */}
+              <button
+                onClick={() => setShowMarketsModal(true)}
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 border-2 border-term-green bg-term-green/10 hover:bg-term-green/20 transition-all group"
+                style={{ boxShadow: '0 0 15px #00ff41, 0 0 30px rgba(0,255,65,0.4)' }}
+              >
+                <BarChart3 className="w-4 h-4 text-term-green" />
+                {selectedMarket ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-term-text max-w-[200px] truncate">
+                      {selectedMarket.question}
+                    </span>
+                    <span className="text-xs text-term-green font-bold term-glow">
+                      {formatCents(selectedMarket.yesPrice || 0.5)}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-term-green font-medium">SELECT MARKET</span>
+                )}
+                <ChevronDown className="w-3 h-3 text-term-green" />
+              </button>
+
+              {/* Mobile Markets Button */}
+              <button
+                onClick={() => setShowMarketsModal(true)}
+                className="sm:hidden flex items-center gap-1.5 px-2.5 py-1.5 border-2 border-term-green bg-term-green/10"
+                style={{ boxShadow: '0 0 15px #00ff41, 0 0 30px rgba(0,255,65,0.4)' }}
+              >
+                <BarChart3 className="w-4 h-4 text-term-green" />
+                <span className="text-xs text-term-green font-medium">MARKETS</span>
+              </button>
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {/* Status indicator */}
+              <div className="hidden lg:flex items-center gap-2 text-[10px] text-term-text-dim">
+                <div className="status-online" />
+                <span>LIVE</span>
+              </div>
+
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-3 px-3 py-2 bg-tertiary rounded-lg hover:bg-border transition-colors"
+                    className="flex items-center gap-3 px-3 py-1.5 border border-term-border hover:border-term-green/50 transition-colors"
                   >
                     {user.balance > 0 ? (
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-accent-green" />
-                        <span className="text-sm font-medium text-text-primary">
-                          ${user.balance?.toLocaleString()}
-                        </span>
-                      </div>
+                      <span className="text-xs text-term-green">
+                        ${user.balance?.toLocaleString()}
+                      </span>
                     ) : (
                       <button
                         onClick={(e) => { e.stopPropagation(); setShowDepositModal(true); setShowUserMenu(false) }}
-                        className="flex items-center gap-1.5 px-2 py-1 bg-accent-green/20 rounded text-accent-green text-sm font-medium hover:bg-accent-green/30 transition-colors"
+                        className="flex items-center gap-1 text-xs text-term-amber hover:text-term-amber-dim"
                       >
                         <Plus className="w-3 h-3" />
-                        Deposit
+                        DEPOSIT
                       </button>
                     )}
-                    <div className="w-px h-4 bg-border" />
-                    <span className="text-sm text-text-secondary max-w-[120px] truncate">
-                      {user.email}
+                    <span className="text-term-border">|</span>
+                    <span className="text-xs text-term-text max-w-[80px] truncate">
+                      {user.email || user.walletAddress?.slice(0, 6)}
                     </span>
-                    <ChevronDown className="w-4 h-4 text-text-secondary" />
                   </button>
 
                   {/* Dropdown menu */}
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-56 bg-secondary border border-border rounded-lg shadow-xl py-2 animate-fade-in">
-                      <div className="px-4 py-2 border-b border-border">
-                        <p className="text-xs text-text-secondary">Signed in as</p>
-                        <p className="text-sm text-text-primary truncate">
-                          {user.email}
+                    <div className="absolute right-0 mt-1 w-56 bg-term-dark border border-term-border shadow-xl z-50">
+                      <div className="px-3 py-2 border-b border-term-border">
+                        <p className="text-[10px] text-term-text-dim uppercase">Session</p>
+                        <p className="text-xs text-term-text truncate mt-1">
+                          {user.email || user.walletAddress?.slice(0, 20)}
                         </p>
                       </div>
-                      <button className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:bg-tertiary hover:text-text-primary transition-colors flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        Profile
-                      </button>
                       <button
                         onClick={() => { setShowDepositModal(true); setShowUserMenu(false) }}
-                        className="w-full px-4 py-2 text-left text-sm text-accent-green hover:bg-tertiary transition-colors flex items-center gap-2"
+                        className="w-full px-3 py-2 text-left text-xs text-term-green hover:bg-term-green/10 transition-colors flex items-center gap-2"
                       >
-                        <Plus className="w-4 h-4" />
-                        Deposit Funds
+                        <Plus className="w-3 h-3" />
+                        &gt; DEPOSIT
                       </button>
                       <button
                         onClick={() => { setShowExportModal(true); setShowUserMenu(false) }}
-                        className="w-full px-4 py-2 text-left text-sm text-accent-yellow hover:bg-tertiary transition-colors flex items-center gap-2"
+                        className="w-full px-3 py-2 text-left text-xs text-term-amber hover:bg-term-amber/10 transition-colors flex items-center gap-2"
                       >
-                        <Key className="w-4 h-4" />
-                        Export Private Key
+                        <Key className="w-3 h-3" />
+                        &gt; EXPORT_KEY
                       </button>
-                      <div className="border-t border-border mt-2 pt-2">
+                      <div className="border-t border-term-border">
                         <button
                           onClick={() => {
                             logout()
                             setShowUserMenu(false)
                           }}
-                          className="w-full px-4 py-2 text-left text-sm text-accent-red hover:bg-tertiary transition-colors flex items-center gap-2"
+                          className="w-full px-3 py-2 text-left text-xs text-term-red hover:bg-term-red/10 transition-colors flex items-center gap-2"
                         >
-                          <LogOut className="w-4 h-4" />
-                          Sign Out
+                          <LogOut className="w-3 h-3" />
+                          &gt; LOGOUT
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <Button onClick={() => setShowAuthModal(true)} variant="success" size="md">
-                  <User className="w-4 h-4" />
-                  Sign Up
-                </Button>
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center gap-2 px-4 py-1.5 border border-term-green text-term-green text-xs hover:bg-term-green hover:text-term-black transition-colors"
+                >
+                  <User className="w-3 h-3" />
+                  CONNECT
+                </button>
               )}
 
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 hover:bg-tertiary rounded-lg transition-colors"
+                className="md:hidden p-2 hover:bg-term-gray transition-colors"
               >
                 {mobileMenuOpen ? (
-                  <X className="w-5 h-5 text-text-primary" />
+                  <X className="w-4 h-4 text-term-text" />
                 ) : (
-                  <Menu className="w-5 h-5 text-text-primary" />
+                  <Menu className="w-4 h-4 text-term-text" />
                 )}
               </button>
             </div>
@@ -171,72 +219,70 @@ export function Header() {
 
           {/* Mobile Nav */}
           {mobileMenuOpen && (
-            <nav className="md:hidden mt-4 pt-4 border-t border-border flex flex-col gap-2">
-              <Link to="/" className="px-4 py-2 text-sm font-medium text-text-primary hover:bg-tertiary rounded-lg transition-colors">
-                Trade
+            <nav className="md:hidden mt-3 pt-3 border-t border-term-border flex flex-col">
+              <Link to="/" className="px-3 py-2 text-xs text-term-text-dim hover:text-term-green">
+                TERMINAL
               </Link>
-              <Link to="/docs" className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-tertiary rounded-lg transition-colors">
-                Docs
+              <Link to="/docs" className="px-3 py-2 text-xs text-term-text-dim hover:text-term-green">
+                ABOUT
               </Link>
-              <a href="https://x.com/PolyPerpetuals" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-tertiary rounded-lg transition-colors flex items-center gap-2">
-                <XIcon className="w-4 h-4" />
-                Twitter
+              <a href="https://x.com/PolyPerpetuals" target="_blank" rel="noopener noreferrer" className="px-3 py-2 text-xs text-term-text-dim hover:text-term-green">
+                X
               </a>
             </nav>
           )}
         </div>
       </header>
 
+      {/* Markets Modal */}
+      <MarketsModal isOpen={showMarketsModal} onClose={() => setShowMarketsModal(false)} />
+
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
 
       {/* Deposit Modal */}
-      <Modal isOpen={showDepositModal} onClose={() => setShowDepositModal(false)} title="Deposit Funds" size="md">
-        <div className="space-y-6">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent-green/20 flex items-center justify-center">
-              <DollarSign className="w-8 h-8 text-accent-green" />
-            </div>
-            <p className="text-text-secondary">
-              Send USDC to your deposit address to start trading
-            </p>
+      <Modal isOpen={showDepositModal} onClose={() => setShowDepositModal(false)} title="DEPOSIT" size="md">
+        <div className="space-y-4">
+          <div className="text-xs text-term-text-dim">
+            Send USDC to your deposit address to start trading
           </div>
 
-          <div className="bg-primary rounded-lg border border-border p-4">
-            <p className="text-xs text-text-secondary mb-2">Your Deposit Address (Polygon)</p>
+          <div className="border border-term-border p-3">
+            <p className="text-[10px] text-term-text-dim uppercase mb-2">Deposit Address (Polygon)</p>
             <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm text-text-primary font-mono bg-tertiary px-3 py-2 rounded break-all">
+              <code className="flex-1 text-xs text-term-green bg-term-black px-2 py-1.5 break-all">
                 {user?.walletAddress || '0x...'}
               </code>
               <button
-                onClick={() => navigator.clipboard.writeText(user?.walletAddress || '')}
-                className="px-3 py-2 bg-tertiary hover:bg-border rounded text-sm text-text-secondary hover:text-text-primary transition-colors"
+                onClick={() => {
+                  navigator.clipboard.writeText(user?.walletAddress || '')
+                  toast.success('Address copied')
+                }}
+                className="px-2 py-1.5 border border-term-border text-xs text-term-text hover:border-term-green hover:text-term-green transition-colors"
               >
-                Copy
+                COPY
               </button>
             </div>
           </div>
 
-          <div className="bg-accent-yellow/10 border border-accent-yellow/20 rounded-lg p-4">
-            <p className="text-sm text-text-primary">
-              <strong>Note:</strong> Only send USDC on Polygon network. Deposits typically confirm within 2-5 minutes.
-            </p>
+          <div className="border border-term-amber/30 bg-term-amber/5 p-3 text-xs text-term-amber">
+            <strong>NOTE:</strong> Only send USDC on Polygon network.
           </div>
 
-          <div className="text-center text-xs text-text-secondary">
-            Minimum deposit: $10 USDC
+          <div className="text-center text-[10px] text-term-text-dim">
+            MIN DEPOSIT: $10 USDC
           </div>
         </div>
       </Modal>
 
       {/* Export Private Key Modal */}
-      <Modal isOpen={showExportModal} onClose={closeExportModal} title="Export Private Key" size="md">
-        <div className="space-y-6">
-          <div className="flex items-start gap-3 p-4 bg-accent-red/10 border border-accent-red/20 rounded-lg">
-            <AlertTriangle className="w-5 h-5 text-accent-red flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="text-text-primary font-medium mb-1">Never share your private key</p>
-              <p className="text-text-secondary">
-                Anyone with your private key has full control of your wallet. Store it securely and never share it.
+      <Modal isOpen={showExportModal} onClose={closeExportModal} title="EXPORT_KEY" size="md">
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-3 border border-term-red/30 bg-term-red/5">
+            <AlertTriangle className="w-4 h-4 text-term-red flex-shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <p className="text-term-red font-medium mb-1">WARNING: SENSITIVE DATA</p>
+              <p className="text-term-text-dim">
+                Never share your private key. Anyone with access has full control.
               </p>
             </div>
           </div>
@@ -245,58 +291,60 @@ export function Header() {
             <>
               {user?.email && (
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">
-                    Enter your password to reveal private key
+                  <label className="block text-[10px] text-term-text-dim uppercase mb-1">
+                    Enter password to decrypt
                   </label>
                   <input
                     type="password"
                     value={exportPassword}
                     onChange={(e) => setExportPassword(e.target.value)}
-                    placeholder="Your password"
-                    className="w-full bg-primary border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
+                    placeholder="********"
+                    className="w-full bg-term-black border border-term-border px-3 py-2 text-xs text-term-text placeholder:text-term-text-dim"
                   />
                 </div>
               )}
-              <Button onClick={handleExportKey} variant="warning" className="w-full">
-                <Key className="w-4 h-4" />
-                Reveal Private Key
-              </Button>
+              <button
+                onClick={handleExportKey}
+                className="w-full px-4 py-2 border border-term-amber text-term-amber text-xs hover:bg-term-amber hover:text-term-black transition-colors"
+              >
+                &gt; REVEAL_KEY
+              </button>
             </>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
-                <label className="block text-xs text-text-secondary mb-1.5">
-                  Your Private Key
+                <label className="block text-[10px] text-term-text-dim uppercase mb-1">
+                  Private Key
                 </label>
                 <div className="relative">
                   <input
                     type={showKey ? 'text' : 'password'}
                     value={revealedKey}
                     readOnly
-                    className="w-full bg-primary border border-border rounded-lg px-4 py-2.5 pr-20 text-sm text-text-primary font-mono focus:outline-none"
+                    className="w-full bg-term-black border border-term-border px-3 py-2 pr-16 text-xs text-term-green"
                   />
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button
                       onClick={() => setShowKey(!showKey)}
-                      className="p-1.5 hover:bg-tertiary rounded transition-colors"
+                      className="p-1 hover:bg-term-gray"
                     >
                       {showKey ? (
-                        <EyeOff className="w-4 h-4 text-text-secondary" />
+                        <EyeOff className="w-3 h-3 text-term-text-dim" />
                       ) : (
-                        <Eye className="w-4 h-4 text-text-secondary" />
+                        <Eye className="w-3 h-3 text-term-text-dim" />
                       )}
                     </button>
                     <button
                       onClick={handleCopyKey}
-                      className="p-1.5 hover:bg-tertiary rounded transition-colors"
+                      className="p-1 hover:bg-term-gray"
                     >
-                      <Copy className="w-4 h-4 text-text-secondary" />
+                      <Copy className="w-3 h-3 text-term-text-dim" />
                     </button>
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-text-secondary">
-                You can import this private key into any Ethereum-compatible wallet like MetaMask to access your funds on Polygon.
+              <p className="text-[10px] text-term-text-dim">
+                Import this key into MetaMask or any EVM wallet to access funds on Polygon.
               </p>
             </div>
           )}

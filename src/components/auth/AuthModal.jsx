@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Mail, Eye, EyeOff, Zap } from 'lucide-react'
+import { Mail, Eye, EyeOff, Terminal } from 'lucide-react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { useAuth } from '../../context/AuthContext'
@@ -34,7 +34,7 @@ export function AuthModal({ isOpen, onClose }) {
           throw new Error('Please enter a valid email')
         }
         await register(email, password)
-        toast.success('Account created! Welcome to PolyPerps!')
+        toast.success('Account created! Welcome to Polynomial!')
       } else {
         await login(email, password)
         toast.success('Welcome back!')
@@ -59,15 +59,15 @@ export function AuthModal({ isOpen, onClose }) {
       <div>
         {/* Logo and header */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-accent-green via-accent-blue to-accent-purple flex items-center justify-center">
-            <Zap className="w-8 h-8 text-white" />
+          <div className="w-14 h-14 mx-auto mb-4 border border-term-green flex items-center justify-center bg-term-green/10">
+            <Terminal className="w-7 h-7 text-term-green" />
           </div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">
-            {mode === 'register' ? 'Create Account' : 'Welcome Back'}
+          <h2 className="text-lg font-bold text-term-green term-glow mb-2">
+            {mode === 'register' ? '> CREATE_ACCOUNT' : '> LOGIN'}
           </h2>
-          <p className="text-text-secondary text-sm">
+          <p className="text-term-text-dim text-xs">
             {mode === 'register'
-              ? 'Start trading prediction markets with up to 25x leverage'
+              ? 'Trade prediction markets with up to 25x leverage'
               : 'Sign in to access your account'
             }
           </p>
@@ -75,30 +75,30 @@ export function AuthModal({ isOpen, onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-accent-red/10 border border-accent-red/30 rounded-lg text-sm text-accent-red">
-              {error}
+            <div className="p-2 border border-term-red/30 bg-term-red/10 text-xs text-term-red">
+              &gt; ERROR: {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">
+            <label className="block text-[10px] text-term-text-dim uppercase mb-1">
               Email
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-term-text-dim" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder="user@example.com"
                 required
-                className="w-full bg-primary border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
+                className="w-full bg-term-black border border-term-border pl-10 pr-4 py-2 text-xs text-term-text placeholder:text-term-text-dim"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">
+            <label className="block text-[10px] text-term-text-dim uppercase mb-1">
               Password
             </label>
             <div className="relative">
@@ -106,14 +106,14 @@ export function AuthModal({ isOpen, onClose }) {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder="********"
                 required
-                className="w-full bg-primary border border-border rounded-lg px-4 py-2.5 pr-10 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
+                className="w-full bg-term-black border border-term-border px-4 py-2 pr-10 text-xs text-term-text placeholder:text-term-text-dim"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-term-text-dim hover:text-term-text"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -122,16 +122,16 @@ export function AuthModal({ isOpen, onClose }) {
 
           {mode === 'register' && (
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">
+              <label className="block text-[10px] text-term-text-dim uppercase mb-1">
                 Confirm Password
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
+                placeholder="********"
                 required
-                className="w-full bg-primary border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
+                className="w-full bg-term-black border border-term-border px-4 py-2 text-xs text-term-text placeholder:text-term-text-dim"
               />
             </div>
           )}
@@ -143,17 +143,17 @@ export function AuthModal({ isOpen, onClose }) {
             size="lg"
             className="w-full"
           >
-            {mode === 'register' ? 'Create Account' : 'Sign In'}
+            &gt; {mode === 'register' ? 'CREATE_ACCOUNT' : 'LOGIN'}
           </Button>
         </form>
 
-        <p className="text-sm text-text-secondary text-center mt-4">
+        <p className="text-xs text-term-text-dim text-center mt-4">
           {mode === 'register' ? (
             <>
               Already have an account?{' '}
               <button
                 onClick={() => { setMode('login'); resetForm() }}
-                className="text-accent-blue hover:underline font-medium"
+                className="text-term-green hover:underline"
               >
                 Sign in
               </button>
@@ -163,7 +163,7 @@ export function AuthModal({ isOpen, onClose }) {
               Don't have an account?{' '}
               <button
                 onClick={() => { setMode('register'); resetForm() }}
-                className="text-accent-blue hover:underline font-medium"
+                className="text-term-green hover:underline"
               >
                 Create one
               </button>

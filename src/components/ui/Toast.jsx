@@ -15,30 +15,39 @@ export function ToastContainer() {
 
 function Toast({ toast, onClose }) {
   const icons = {
-    success: <CheckCircle className="w-5 h-5 text-accent-green" />,
-    error: <XCircle className="w-5 h-5 text-accent-red" />,
-    warning: <AlertTriangle className="w-5 h-5 text-accent-yellow" />,
-    info: <Info className="w-5 h-5 text-accent-blue" />,
+    success: <CheckCircle className="w-4 h-4 text-term-green" />,
+    error: <XCircle className="w-4 h-4 text-term-red" />,
+    warning: <AlertTriangle className="w-4 h-4 text-term-amber" />,
+    info: <Info className="w-4 h-4 text-term-cyan" />,
   }
 
   const backgrounds = {
-    success: 'border-accent-green/30 bg-accent-green/10',
-    error: 'border-accent-red/30 bg-accent-red/10',
-    warning: 'border-accent-yellow/30 bg-accent-yellow/10',
-    info: 'border-accent-blue/30 bg-accent-blue/10',
+    success: 'border-term-green/30 bg-term-green/10',
+    error: 'border-term-red/30 bg-term-red/10',
+    warning: 'border-term-amber/30 bg-term-amber/10',
+    info: 'border-term-cyan/30 bg-term-cyan/10',
+  }
+
+  const textColors = {
+    success: 'text-term-green',
+    error: 'text-term-red',
+    warning: 'text-term-amber',
+    info: 'text-term-cyan',
   }
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${backgrounds[toast.type]} toast-enter min-w-[300px] max-w-[400px] shadow-lg`}
+      className={`flex items-center gap-3 px-3 py-2 border ${backgrounds[toast.type]} min-w-[280px] max-w-[380px] shadow-lg bg-term-dark`}
     >
       {icons[toast.type]}
-      <p className="text-sm text-text-primary flex-1">{toast.message}</p>
+      <p className={`text-xs flex-1 ${textColors[toast.type]}`}>
+        &gt; {toast.message}
+      </p>
       <button
         onClick={onClose}
-        className="p-1 hover:bg-white/10 rounded transition-colors"
+        className="p-1 hover:bg-term-gray transition-colors"
       >
-        <X className="w-4 h-4 text-text-secondary" />
+        <X className="w-3 h-3 text-term-text-dim" />
       </button>
     </div>
   )

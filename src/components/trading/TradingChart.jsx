@@ -3,7 +3,6 @@ import { createChart } from 'lightweight-charts'
 import { useMarket } from '../../context/MarketContext'
 import { TIMEFRAMES } from '../../utils/constants'
 import { formatCents, formatChange } from '../../utils/formatters'
-import { ChartSkeleton } from '../ui/Skeleton'
 
 export function TradingChart() {
   const chartContainerRef = useRef(null)
@@ -21,49 +20,48 @@ export function TradingChart() {
     get24hChange,
   } = useMarket()
 
-
-  // Initialize chart - depends on selectedMarket because the container isn't rendered without it
+  // Initialize chart with terminal theme
   useEffect(() => {
     if (!chartContainerRef.current || !selectedMarket) {
-      console.log('[Chart] Container not ready:', { hasContainer: !!chartContainerRef.current, hasMarket: !!selectedMarket })
       return
     }
 
     const chart = createChart(chartContainerRef.current, {
       layout: {
-        background: { type: 'solid', color: '#161b22' },
-        textColor: '#8b949e',
+        background: { type: 'solid', color: '#0a0a0a' },
+        textColor: '#606060',
+        fontFamily: 'IBM Plex Mono, monospace',
       },
       grid: {
-        vertLines: { color: '#21262d' },
-        horzLines: { color: '#21262d' },
+        vertLines: { color: '#1a1a1a' },
+        horzLines: { color: '#1a1a1a' },
       },
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight || 300,
       crosshair: {
         mode: 1,
         vertLine: {
-          color: '#58a6ff',
+          color: '#00ff41',
           width: 1,
           style: 2,
-          labelBackgroundColor: '#58a6ff',
+          labelBackgroundColor: '#00ff41',
         },
         horzLine: {
-          color: '#58a6ff',
+          color: '#00ff41',
           width: 1,
           style: 2,
-          labelBackgroundColor: '#58a6ff',
+          labelBackgroundColor: '#00ff41',
         },
       },
       rightPriceScale: {
-        borderColor: '#30363d',
+        borderColor: '#2a2a2a',
         scaleMargins: {
           top: 0.1,
           bottom: 0.1,
         },
       },
       timeScale: {
-        borderColor: '#30363d',
+        borderColor: '#2a2a2a',
         timeVisible: true,
         secondsVisible: false,
       },
@@ -71,12 +69,12 @@ export function TradingChart() {
 
     chartRef.current = chart
 
-    // Create area series
+    // Create area series with terminal green
     const areaSeries = chart.addAreaSeries({
-      lineColor: '#00d26a',
-      topColor: 'rgba(0, 210, 106, 0.4)',
-      bottomColor: 'rgba(0, 210, 106, 0.0)',
-      lineWidth: 2,
+      lineColor: '#00ff41',
+      topColor: 'rgba(0, 255, 65, 0.2)',
+      bottomColor: 'rgba(0, 255, 65, 0.0)',
+      lineWidth: 1,
       priceFormat: {
         type: 'price',
         precision: 2,
@@ -85,12 +83,6 @@ export function TradingChart() {
     })
 
     seriesRef.current = areaSeries
-
-    console.log('[Chart] Initialized with dimensions:', {
-      width: chartContainerRef.current.clientWidth,
-      height: chartContainerRef.current.clientHeight,
-    })
-
     setChartReady(true)
 
     // Handle resize
@@ -106,11 +98,8 @@ export function TradingChart() {
       }
     }
 
-    // Use ResizeObserver for better resize detection
     const resizeObserver = new ResizeObserver(handleResize)
     resizeObserver.observe(chartContainerRef.current)
-
-    // Initial resize after mount
     setTimeout(handleResize, 100)
 
     return () => {
@@ -123,17 +112,13 @@ export function TradingChart() {
   // Update data when price history changes
   useEffect(() => {
     if (!chartReady || !seriesRef.current || !chartRef.current) {
-      console.log('[Chart] Waiting for chart to be ready...', { chartReady })
       return
     }
 
     if (!priceHistory || priceHistory.length === 0) {
-      console.log('[Chart] No price history data')
       return
     }
 
-    // Prepare and validate data for lightweight-charts
-    // Must be sorted by time ascending with unique timestamps
     const dataMap = new Map()
     priceHistory.forEach(point => {
       const time = Math.floor(Number(point.time))
@@ -145,28 +130,23 @@ export function TradingChart() {
 
     const data = Array.from(dataMap.values()).sort((a, b) => a.time - b.time)
 
-    console.log('[Chart] Setting data:', data.length, 'points')
-
     if (data.length === 0) {
-      console.log('[Chart] No valid data points after processing')
       return
     }
 
     try {
       seriesRef.current.setData(data)
 
-      // Update line color based on trend
       const isPositive = data.length >= 2
         ? data[data.length - 1].value >= data[0].value
         : true
 
       seriesRef.current.applyOptions({
-        lineColor: isPositive ? '#00d26a' : '#ff3b69',
-        topColor: isPositive ? 'rgba(0, 210, 106, 0.4)' : 'rgba(255, 59, 105, 0.4)',
-        bottomColor: isPositive ? 'rgba(0, 210, 106, 0.0)' : 'rgba(255, 59, 105, 0.0)',
+        lineColor: isPositive ? '#00ff41' : '#ff0040',
+        topColor: isPositive ? 'rgba(0, 255, 65, 0.2)' : 'rgba(255, 0, 64, 0.2)',
+        bottomColor: isPositive ? 'rgba(0, 255, 65, 0.0)' : 'rgba(255, 0, 64, 0.0)',
       })
 
-      // Fit content
       chartRef.current.timeScale().fitContent()
     } catch (e) {
       console.error('[Chart] Error setting data:', e)
@@ -179,30 +159,28 @@ export function TradingChart() {
 
   if (!selectedMarket) {
     return (
-      <div className="bg-secondary rounded-lg border border-border p-6">
-        <div className="text-center text-text-secondary">
-          Select a market to view the chart
+      <div className="bg-term-dark border border-term-border h-full flex items-center justify-center">
+        <div className="text-xs text-term-text-dim">
+          &gt; SELECT MARKET_
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-secondary rounded-lg border border-border overflow-hidden h-full flex flex-col">
+    <div className="bg-term-dark border border-term-border overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-sm text-text-secondary mb-1">
+      <div className="px-3 py-2 border-b border-term-border">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-term-text-dim uppercase tracking-wider mb-1 truncate">
               {selectedMarket.question}
-            </h2>
+            </p>
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-text-primary">
+              <span className={`text-2xl font-bold ${isPositive ? 'text-term-green term-glow' : 'text-term-red term-glow-red'}`}>
                 {formatCents(currentPrice)}
               </span>
-              <span className={`text-sm font-medium ${
-                isPositive ? 'text-accent-green' : 'text-accent-red'
-              }`}>
+              <span className={`text-xs ${isPositive ? 'text-term-green' : 'text-term-red'}`}>
                 {formatChange(change24h)}
               </span>
             </div>
@@ -210,15 +188,15 @@ export function TradingChart() {
         </div>
 
         {/* Timeframe selector */}
-        <div className="flex items-center gap-2 mt-4">
+        <div className="flex items-center gap-1 mt-3">
           {TIMEFRAMES.map((tf) => (
             <button
               key={tf.label}
               onClick={() => setSelectedTimeframe(tf.interval)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              className={`px-2 py-1 text-[10px] transition-colors ${
                 selectedTimeframe === tf.interval
-                  ? 'bg-tertiary text-text-primary'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-tertiary/50'
+                  ? 'text-term-green bg-term-green/10'
+                  : 'text-term-text-dim hover:text-term-green'
               }`}
             >
               {tf.label}
@@ -230,29 +208,29 @@ export function TradingChart() {
       {/* Chart */}
       <div className="relative flex-1" style={{ minHeight: '250px' }}>
         {isLoading && (
-          <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center z-10">
-            <div className="text-text-secondary">Loading...</div>
+          <div className="absolute inset-0 bg-term-dark/80 flex items-center justify-center z-10">
+            <span className="text-xs text-term-text-dim loading-dots">LOADING</span>
           </div>
         )}
         <div ref={chartContainerRef} className="absolute inset-0" />
       </div>
 
       {/* Bottom stats */}
-      <div className="px-4 py-3 border-t border-border flex items-center justify-between text-xs text-text-secondary">
-        <div className="flex items-center gap-4">
+      <div className="px-3 py-2 border-t border-term-border flex items-center justify-between text-[10px]">
+        <div className="flex items-center gap-4 text-term-text-dim">
           <span>
-            High: <span className="text-accent-green font-medium">
+            H: <span className="text-term-green">
               {formatCents(priceHistory.length > 0 ? Math.max(...priceHistory.map(p => p.value)) : currentPrice)}
             </span>
           </span>
           <span>
-            Low: <span className="text-accent-red font-medium">
+            L: <span className="text-term-red">
               {formatCents(priceHistory.length > 0 ? Math.min(...priceHistory.map(p => p.value)) : currentPrice)}
             </span>
           </span>
         </div>
-        <span>
-          Data points: {priceHistory.length}
+        <span className="text-term-text-dim">
+          {priceHistory.length} PTS
         </span>
       </div>
     </div>

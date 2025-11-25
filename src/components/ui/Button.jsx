@@ -8,22 +8,22 @@ export function Button({
   onClick,
   ...props
 }) {
-  const baseClasses = 'font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+  const baseClasses = 'font-medium transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed'
 
   const variants = {
-    primary: 'bg-accent-blue hover:bg-blue-500 text-white btn-glow-green',
-    success: 'bg-accent-green hover:bg-green-500 text-white btn-glow-green',
-    danger: 'bg-accent-red hover:bg-red-500 text-white btn-glow-red',
-    warning: 'bg-accent-yellow hover:bg-yellow-500 text-black',
-    ghost: 'bg-transparent hover:bg-tertiary text-text-primary border border-border',
-    outline: 'bg-transparent border border-accent-blue text-accent-blue hover:bg-accent-blue/10',
+    primary: 'bg-term-green/10 hover:bg-term-green text-term-green hover:text-term-black border border-term-green',
+    success: 'bg-term-green/10 hover:bg-term-green text-term-green hover:text-term-black border border-term-green',
+    danger: 'bg-term-red/10 hover:bg-term-red text-term-red hover:text-term-black border border-term-red',
+    warning: 'bg-term-amber/10 hover:bg-term-amber text-term-amber hover:text-term-black border border-term-amber',
+    ghost: 'bg-transparent hover:bg-term-gray text-term-text border border-term-border hover:border-term-green/50',
+    outline: 'bg-transparent border border-term-green text-term-green hover:bg-term-green/10',
   }
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
-    xl: 'px-8 py-4 text-lg',
+    sm: 'px-2 py-1 text-[10px]',
+    md: 'px-3 py-1.5 text-xs',
+    lg: 'px-4 py-2 text-xs',
+    xl: 'px-6 py-3 text-sm',
   }
 
   return (
@@ -34,22 +34,7 @@ export function Button({
       {...props}
     >
       {loading && (
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
+        <span className="loading-dots">_</span>
       )}
       {children}
     </button>

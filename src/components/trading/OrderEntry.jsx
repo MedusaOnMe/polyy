@@ -1,10 +1,9 @@
 import { useState, useMemo } from 'react'
-import { ArrowUpRight, ArrowDownRight, AlertTriangle, Zap } from 'lucide-react'
+import { ArrowUp, ArrowDown, AlertTriangle } from 'lucide-react'
 import { useMarket } from '../../context/MarketContext'
 import { useAuth } from '../../context/AuthContext'
 import { usePositions } from '../../context/PositionContext'
 import { useToast } from '../../context/ToastContext'
-import { Button } from '../ui/Button'
 import { LeverageSlider } from './LeverageSlider'
 import { formatCents, formatPrice, calculateLiquidationPrice } from '../../utils/formatters'
 import { TRADING_FEE_BPS } from '../../utils/constants'
@@ -15,8 +14,8 @@ export function OrderEntry() {
   const { openPosition } = usePositions()
   const toast = useToast()
 
-  const [side, setSide] = useState('YES') // 'YES' or 'NO'
-  const [orderType, setOrderType] = useState('market') // 'market' or 'limit'
+  const [side, setSide] = useState('YES')
+  const [orderType, setOrderType] = useState('market')
   const [size, setSize] = useState('')
   const [leverage, setLeverage] = useState(5)
   const [limitPrice, setLimitPrice] = useState('')
@@ -31,7 +30,7 @@ export function OrderEntry() {
 
     const margin = sizeNum / leverage
     const shares = sizeNum / effectivePrice
-    const potentialProfit = shares - sizeNum // If outcome is correct (price goes to $1)
+    const potentialProfit = shares - sizeNum
     const fee = sizeNum * (TRADING_FEE_BPS / 10000)
     const liquidationPrice = calculateLiquidationPrice(entryPrice, leverage, side)
 
@@ -47,18 +46,18 @@ export function OrderEntry() {
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
-      toast.error('Please connect your wallet first')
+      toast.error('Connect wallet first')
       return
     }
 
     if (!selectedMarket) {
-      toast.error('Please select a market')
+      toast.error('Select a market')
       return
     }
 
     const sizeNum = parseFloat(size)
     if (!sizeNum || sizeNum <= 0) {
-      toast.error('Please enter a valid size')
+      toast.error('Enter valid size')
       return
     }
 
@@ -69,13 +68,10 @@ export function OrderEntry() {
 
     setLoading(true)
     try {
-      // Simulate order execution delay
       await new Promise(resolve => setTimeout(resolve, 1000))
-
       const entryPrice = orderType === 'limit' ? parseFloat(limitPrice) || currentPrice : currentPrice
       openPosition(selectedMarket, side, sizeNum, leverage, entryPrice)
-
-      toast.success(`Opened ${side} position with ${leverage}x leverage!`)
+      toast.success(`${side} position opened @ ${leverage}x`)
       setSize('')
     } catch (err) {
       toast.error(err.message || 'Failed to open position')
@@ -86,113 +82,108 @@ export function OrderEntry() {
 
   if (!selectedMarket) {
     return (
-      <div className="bg-secondary rounded-lg border border-border p-6">
-        <div className="text-center text-text-secondary">
-          Select a market to trade
+      <div className="bg-term-dark border border-term-border h-full flex items-center justify-center">
+        <div className="text-xs text-term-text-dim">
+          &gt; SELECT_MARKET_
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-secondary rounded-lg border border-border overflow-hidden h-full flex flex-col">
+    <div className="bg-term-dark border border-term-border overflow-hidden h-full flex flex-col">
       {/* Side selector */}
       <div className="grid grid-cols-2">
         <button
           onClick={() => setSide('YES')}
-          className={`py-3 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+          className={`py-2.5 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 border-b ${
             side === 'YES'
-              ? 'bg-accent-green text-white'
-              : 'bg-tertiary text-text-secondary hover:text-text-primary'
+              ? 'bg-term-green/10 text-term-green border-term-green'
+              : 'bg-term-gray text-term-text-dim hover:text-term-text border-term-border'
           }`}
         >
-          <ArrowUpRight className="w-4 h-4" />
-          YES / LONG
+          <ArrowUp className="w-3 h-3" />
+          LONG
         </button>
         <button
           onClick={() => setSide('NO')}
-          className={`py-3 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+          className={`py-2.5 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 border-b ${
             side === 'NO'
-              ? 'bg-accent-red text-white'
-              : 'bg-tertiary text-text-secondary hover:text-text-primary'
+              ? 'bg-term-red/10 text-term-red border-term-red'
+              : 'bg-term-gray text-term-text-dim hover:text-term-text border-term-border'
           }`}
         >
-          <ArrowDownRight className="w-4 h-4" />
-          NO / SHORT
+          <ArrowDown className="w-3 h-3" />
+          SHORT
         </button>
       </div>
 
-      <div className="p-4 space-y-4 flex-1 overflow-auto">
+      <div className="p-3 space-y-3 flex-1 overflow-auto">
         {/* Order type */}
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <button
             onClick={() => setOrderType('market')}
-            className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
+            className={`flex-1 py-1.5 text-[10px] font-medium transition-colors ${
               orderType === 'market'
-                ? 'bg-tertiary text-text-primary'
-                : 'text-text-secondary hover:text-text-primary'
+                ? 'text-term-green bg-term-green/10'
+                : 'text-term-text-dim hover:text-term-text'
             }`}
           >
-            Market
+            MARKET
           </button>
           <button
             onClick={() => setOrderType('limit')}
-            className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
+            className={`flex-1 py-1.5 text-[10px] font-medium transition-colors ${
               orderType === 'limit'
-                ? 'bg-tertiary text-text-primary'
-                : 'text-text-secondary hover:text-text-primary'
+                ? 'text-term-green bg-term-green/10'
+                : 'text-term-text-dim hover:text-term-text'
             }`}
           >
-            Limit
+            LIMIT
           </button>
         </div>
 
         {/* Limit price input */}
         {orderType === 'limit' && (
           <div>
-            <label className="block text-xs text-text-secondary mb-1.5">
+            <label className="block text-[10px] text-term-text-dim uppercase mb-1">
               Limit Price
             </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={limitPrice}
-                onChange={(e) => setLimitPrice(e.target.value)}
-                placeholder={formatCents(currentPrice)}
-                step="0.01"
-                min="0.01"
-                max="0.99"
-                className="w-full bg-primary border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">
-                ¢
-              </span>
-            </div>
+            <input
+              type="number"
+              value={limitPrice}
+              onChange={(e) => setLimitPrice(e.target.value)}
+              placeholder={formatCents(currentPrice)}
+              step="0.01"
+              min="0.01"
+              max="0.99"
+              className="w-full bg-term-black border border-term-border px-3 py-2 text-xs text-term-text placeholder:text-term-text-dim"
+            />
           </div>
         )}
 
         {/* Size input */}
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs text-text-secondary">Size (USD)</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[10px] text-term-text-dim uppercase">Size (USD)</label>
             {isAuthenticated && (
-              <span className="text-xs text-text-secondary">
-                Balance: <span className="text-text-primary">{formatPrice(user?.balance)}</span>
+              <span className="text-[10px] text-term-text-dim">
+                BAL: <span className="text-term-text">{formatPrice(user?.balance)}</span>
               </span>
             )}
           </div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-term-text-dim text-xs">$</span>
             <input
               type="number"
               value={size}
               onChange={(e) => setSize(e.target.value)}
               placeholder="0.00"
-              className="w-full bg-primary border border-border rounded-lg pl-7 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
+              className="w-full bg-term-black border border-term-border pl-6 pr-3 py-2 text-xs text-term-text placeholder:text-term-text-dim"
             />
           </div>
           {/* Quick amount buttons */}
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-1 mt-1.5">
             {[25, 50, 75, 100].map((pct) => (
               <button
                 key={pct}
@@ -202,7 +193,7 @@ export function OrderEntry() {
                   }
                 }}
                 disabled={!isAuthenticated}
-                className="flex-1 py-1.5 text-xs font-medium rounded bg-tertiary text-text-secondary hover:text-text-primary hover:bg-border transition-colors disabled:opacity-50"
+                className="flex-1 py-1 text-[10px] text-term-text-dim hover:text-term-green hover:bg-term-green/10 transition-colors disabled:opacity-30"
               >
                 {pct}%
               </button>
@@ -214,74 +205,70 @@ export function OrderEntry() {
         <LeverageSlider value={leverage} onChange={setLeverage} />
 
         {/* Calculations */}
-        <div className="space-y-2 pt-2 border-t border-border">
-          <div className="flex justify-between text-xs">
-            <span className="text-text-secondary">Entry Price</span>
-            <span className="text-text-primary font-medium">
+        <div className="space-y-1.5 pt-2 border-t border-term-border">
+          <div className="flex justify-between text-[10px]">
+            <span className="text-term-text-dim">ENTRY</span>
+            <span className="text-term-text">
               {formatCents(orderType === 'limit' && limitPrice ? parseFloat(limitPrice) : currentPrice)}
             </span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-text-secondary">Margin Required</span>
-            <span className="text-text-primary font-medium">
-              {formatPrice(calculations.margin)}
-            </span>
+          <div className="flex justify-between text-[10px]">
+            <span className="text-term-text-dim">MARGIN</span>
+            <span className="text-term-text">{formatPrice(calculations.margin)}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-text-secondary">Est. Shares</span>
-            <span className="text-text-primary font-medium">
-              {calculations.shares.toFixed(2)}
-            </span>
+          <div className="flex justify-between text-[10px]">
+            <span className="text-term-text-dim">SHARES</span>
+            <span className="text-term-text">{calculations.shares.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-text-secondary">Potential Profit</span>
-            <span className="text-accent-green font-medium">
+          <div className="flex justify-between text-[10px]">
+            <span className="text-term-text-dim">PROFIT</span>
+            <span className="text-term-green">
               +{formatPrice(calculations.potentialProfit)} ({calculations.roi.toFixed(1)}%)
             </span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-text-secondary">Fee</span>
-            <span className="text-text-primary font-medium">
-              {formatPrice(calculations.fee)}
-            </span>
+          <div className="flex justify-between text-[10px]">
+            <span className="text-term-text-dim">FEE</span>
+            <span className="text-term-text">{formatPrice(calculations.fee)}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-text-secondary flex items-center gap-1">
-              <AlertTriangle className="w-3 h-3 text-accent-yellow" />
-              Liquidation Price
+          <div className="flex justify-between text-[10px]">
+            <span className="text-term-amber flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              LIQ_PRICE
             </span>
-            <span className="text-accent-red font-medium">
-              {formatCents(calculations.liquidationPrice)}
-            </span>
+            <span className="text-term-red">{formatCents(calculations.liquidationPrice)}</span>
           </div>
         </div>
 
         {/* Warning for high leverage */}
         {leverage >= 20 && (
-          <div className="flex items-start gap-2 p-3 bg-accent-yellow/10 border border-accent-yellow/30 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-accent-yellow flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-accent-yellow">
-              High leverage increases liquidation risk. Trade carefully.
+          <div className="flex items-start gap-2 p-2 border border-term-amber/30 bg-term-amber/5">
+            <AlertTriangle className="w-3 h-3 text-term-amber flex-shrink-0 mt-0.5" />
+            <p className="text-[10px] text-term-amber">
+              HIGH LEVERAGE - LIQUIDATION RISK
             </p>
           </div>
         )}
 
         {/* Submit button */}
-        <Button
+        <button
           onClick={handleSubmit}
-          loading={loading}
-          disabled={!size || parseFloat(size) <= 0}
-          variant={side === 'YES' ? 'success' : 'danger'}
-          size="lg"
-          className="w-full"
+          disabled={loading || !size || parseFloat(size) <= 0}
+          className={`w-full py-2.5 text-xs font-medium transition-colors disabled:opacity-30 ${
+            side === 'YES'
+              ? 'border border-term-green text-term-green hover:bg-term-green hover:text-term-black'
+              : 'border border-term-red text-term-red hover:bg-term-red hover:text-term-black'
+          }`}
         >
-          <Zap className="w-4 h-4" />
-          {side === 'YES' ? 'Long' : 'Short'} with {leverage}x
-        </Button>
+          {loading ? (
+            <span className="loading-dots">EXECUTING</span>
+          ) : (
+            `> ${side === 'YES' ? 'LONG' : 'SHORT'} @ ${leverage}x`
+          )}
+        </button>
 
         {!isAuthenticated && (
-          <p className="text-xs text-text-secondary text-center">
-            Connect wallet to trade
+          <p className="text-[10px] text-term-text-dim text-center">
+            &gt; CONNECT_WALLET
           </p>
         )}
       </div>

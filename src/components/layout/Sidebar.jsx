@@ -1,72 +1,47 @@
 import { useState } from 'react'
-import { Search, Flame, TrendingUp, Star, ChevronRight } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useMarket } from '../../context/MarketContext'
 import { formatCents, formatChange, formatCompact } from '../../utils/formatters'
-import { MarketCardSkeleton } from '../ui/Skeleton'
 
 export function Sidebar() {
   const { markets, selectedMarket, selectMarket, isLoading } = useMarket()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('hot')
-
-  const categories = [
-    { id: 'hot', name: 'Hot', icon: <Flame className="w-4 h-4" /> },
-    { id: 'trending', name: 'Trending', icon: <TrendingUp className="w-4 h-4" /> },
-    { id: 'favorites', name: 'Favorites', icon: <Star className="w-4 h-4" /> },
-  ]
 
   const filteredMarkets = markets.filter(market =>
     market.question?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
-    <aside className="w-80 bg-secondary border-r border-border flex flex-col h-full">
-      {/* Search */}
-      <div className="p-4 border-b border-border">
+    <aside className="w-80 bg-term-dark border-r border-term-border flex flex-col h-full">
+      {/* Header */}
+      <div className="px-3 py-2 border-b border-term-border">
+        <div className="text-[10px] text-term-text-dim uppercase tracking-wider mb-2">
+          MARKETS [{markets.length}]
+        </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-term-text-dim" />
           <input
             type="text"
-            placeholder="Search markets..."
+            placeholder="search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-primary border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent-blue transition-colors"
+            className="w-full bg-term-black border border-term-border pl-7 pr-3 py-1.5 text-xs text-term-text placeholder:text-term-text-dim"
           />
         </div>
-      </div>
-
-      {/* Categories */}
-      <div className="flex gap-2 px-4 py-3 border-b border-border">
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setSelectedCategory(cat.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              selectedCategory === cat.id
-                ? 'bg-accent-blue/20 text-accent-blue'
-                : 'text-text-secondary hover:bg-tertiary hover:text-text-primary'
-            }`}
-          >
-            {cat.icon}
-            {cat.name}
-          </button>
-        ))}
       </div>
 
       {/* Market list */}
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="p-4 space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <MarketCardSkeleton key={i} />
-            ))}
+          <div className="p-4 text-center">
+            <span className="text-xs text-term-text-dim loading-dots">LOADING</span>
           </div>
         ) : filteredMarkets.length === 0 ? (
-          <div className="p-8 text-center text-text-secondary">
-            No markets found
+          <div className="p-4 text-center text-xs text-term-text-dim">
+            NO RESULTS
           </div>
         ) : (
-          <div className="p-2">
+          <div className="py-1">
             {filteredMarkets.map((market) => (
               <MarketItem
                 key={market.id}
@@ -79,14 +54,14 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Stats footer */}
-      <div className="p-4 border-t border-border bg-primary">
-        <div className="flex items-center justify-between text-xs text-text-secondary">
-          <span>{markets.length} markets</span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 bg-accent-green rounded-full" />
-            Live
-          </span>
+      {/* Footer */}
+      <div className="px-3 py-2 border-t border-term-border">
+        <div className="flex items-center justify-between text-[10px] text-term-text-dim">
+          <span>{filteredMarkets.length} ITEMS</span>
+          <div className="flex items-center gap-1.5">
+            <div className="status-online" />
+            <span>CONNECTED</span>
+          </div>
         </div>
       </div>
     </aside>
@@ -94,7 +69,6 @@ export function Sidebar() {
 }
 
 function MarketItem({ market, isSelected, onSelect }) {
-  // Use pre-parsed yesPrice from normalized market data
   const yesPrice = market.yesPrice || 0.5
   const volume = market.volume24hr || market.volumeNum || 0
 
@@ -105,41 +79,38 @@ function MarketItem({ market, isSelected, onSelect }) {
   return (
     <button
       onClick={onSelect}
-      className={`w-full p-3 rounded-lg text-left transition-all ${
+      className={`w-full px-3 py-2 text-left transition-all border-l-2 ${
         isSelected
-          ? 'bg-accent-blue/10 border border-accent-blue/30'
-          : 'hover:bg-tertiary border border-transparent'
+          ? 'bg-term-green/5 border-l-term-green'
+          : 'border-l-transparent hover:bg-term-gray hover:border-l-term-text-dim'
       }`}
     >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <p className="text-sm font-medium text-text-primary line-clamp-2 flex-1">
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <p className={`text-xs line-clamp-2 flex-1 ${isSelected ? 'text-term-green' : 'text-term-text'}`}>
           {market.question}
         </p>
-        <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform ${
-          isSelected ? 'text-accent-blue rotate-90' : 'text-text-secondary'
-        }`} />
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-lg font-bold text-accent-green">
+        <div className="flex items-center gap-2">
+          <span className={`text-sm font-bold ${isSelected ? 'text-term-green term-glow' : 'text-term-green'}`}>
             {formatCents(yesPrice)}
           </span>
-          <span className={`text-xs font-medium ${
-            change >= 0 ? 'text-accent-green' : 'text-accent-red'
+          <span className={`text-[10px] ${
+            change >= 0 ? 'text-term-green' : 'text-term-red'
           }`}>
             {formatChange(change)}
           </span>
         </div>
-        <span className="text-xs text-text-secondary">
-          Vol: {formatCompact(volume)}
+        <span className="text-[10px] text-term-text-dim">
+          {formatCompact(volume)}
         </span>
       </div>
 
-      {/* Mini progress bar showing YES/NO distribution */}
-      <div className="mt-2 h-1.5 bg-accent-red/30 rounded-full overflow-hidden">
+      {/* Terminal-style progress bar */}
+      <div className="mt-1.5 h-1 bg-term-gray overflow-hidden">
         <div
-          className="h-full bg-accent-green rounded-full transition-all"
+          className="h-full bg-term-green/50 transition-all"
           style={{ width: `${yesPrice * 100}%` }}
         />
       </div>

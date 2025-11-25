@@ -1,58 +1,62 @@
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { MarketProvider } from './context/MarketContext'
 import { PositionProvider } from './context/PositionContext'
 import { ToastProvider } from './context/ToastContext'
 import { Header } from './components/layout/Header'
-import { Sidebar } from './components/layout/Sidebar'
 import { TradingChart } from './components/trading/TradingChart'
 import { OrderBook } from './components/trading/OrderBook'
 import { OrderEntry } from './components/trading/OrderEntry'
 import { MarketStats } from './components/trading/MarketStats'
 import { PositionsPanel } from './components/positions/PositionsPanel'
 import { ToastContainer } from './components/ui/Toast'
+import { LoadingScreen } from './components/ui/LoadingScreen'
 import { Docs } from './pages/Docs'
 
 function TradingPage() {
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-term-black">
+      {/* CRT Scanline overlay */}
+      <div className="crt-overlay" />
+
       <Header />
 
-      <div className="flex h-[calc(100vh-105px)]">
-        {/* Sidebar - Markets list */}
-        <div className="hidden lg:block">
-          <Sidebar />
-        </div>
+      {/* Main content - full width now */}
+      <main className="h-[calc(100vh-49px)] overflow-auto">
+        <div className="p-2 lg:p-3">
+          {/* Two column layout */}
+          <div className="flex flex-col xl:flex-row gap-2 lg:gap-3">
 
-        {/* Main content */}
-        <main className="flex-1 overflow-auto">
-          <div className="p-4 space-y-4">
-            {/* Top row: Chart + Order Book + Order Entry */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:h-[650px]">
-              {/* Chart - takes most space */}
-              <div className="xl:col-span-7 h-[650px]">
+            {/* Left Column: Chart + Stats + Positions */}
+            <div className="flex-1 flex flex-col gap-2 lg:gap-3 min-w-0">
+              {/* Chart - Main focus */}
+              <div className="h-[450px] lg:h-[520px]">
                 <TradingChart />
               </div>
 
-              {/* Order Book */}
-              <div className="xl:col-span-2 h-[650px]">
-                <OrderBook />
-              </div>
+              {/* Market Stats - Horizontal bar */}
+              <MarketStats />
 
-              {/* Order Entry */}
-              <div className="xl:col-span-3 h-[650px]">
-                <OrderEntry />
-              </div>
+              {/* Positions Panel */}
+              <PositionsPanel />
             </div>
 
-            {/* Market Stats */}
-            <MarketStats />
+            {/* Right Column: Order Entry + Order Book stacked */}
+            <div className="xl:w-[380px] flex flex-col gap-2 lg:gap-3">
+              {/* Order Entry on top */}
+              <div className="h-auto">
+                <OrderEntry />
+              </div>
 
-            {/* Positions Panel */}
-            <PositionsPanel />
+              {/* Order Book below */}
+              <div className="h-[380px] xl:h-[400px]">
+                <OrderBook />
+              </div>
+            </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       <ToastContainer />
     </div>
@@ -60,16 +64,37 @@ function TradingPage() {
 }
 
 function App() {
+  const [loading, setLoading] = useState(true)
+  const [showApp, setShowApp] = useState(false)
+
+  useEffect(() => {
+    // Check if we've already shown the loading screen this session
+    const hasLoaded = sessionStorage.getItem('polynomial_loaded')
+    if (hasLoaded) {
+      setLoading(false)
+      setShowApp(true)
+    }
+  }, [])
+
+  const handleLoadingComplete = () => {
+    sessionStorage.setItem('polynomial_loaded', 'true')
+    setLoading(false)
+    setTimeout(() => setShowApp(true), 100)
+  }
+
   return (
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
           <MarketProvider>
             <PositionProvider>
-              <Routes>
-                <Route path="/" element={<TradingPage />} />
-                <Route path="/docs" element={<Docs />} />
-              </Routes>
+              {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
+              {showApp && (
+                <Routes>
+                  <Route path="/" element={<TradingPage />} />
+                  <Route path="/docs" element={<Docs />} />
+                </Routes>
+              )}
             </PositionProvider>
           </MarketProvider>
         </AuthProvider>
