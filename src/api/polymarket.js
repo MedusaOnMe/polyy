@@ -1,5 +1,6 @@
 // Polymarket API endpoints
 // Using Vite proxy to bypass CORS restrictions
+// Note: Proxy only works in dev mode - production falls back to mock data
 const GAMMA_API = '/gamma-api'
 const CLOB_API = '/clob-api'
 
