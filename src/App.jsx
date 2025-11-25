@@ -28,19 +28,19 @@ function TradingPage() {
         <main className="flex-1 overflow-auto">
           <div className="p-4 space-y-4">
             {/* Top row: Chart + Order Book + Order Entry */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:h-[500px]">
               {/* Chart - takes most space */}
-              <div className="xl:col-span-7 h-[520px]">
+              <div className="xl:col-span-7 h-[500px]">
                 <TradingChart />
               </div>
 
               {/* Order Book */}
-              <div className="xl:col-span-2 min-h-[400px]">
+              <div className="xl:col-span-2 h-[500px]">
                 <OrderBook />
               </div>
 
               {/* Order Entry */}
-              <div className="xl:col-span-3 min-h-[400px]">
+              <div className="xl:col-span-3 h-[500px]">
                 <OrderEntry />
               </div>
             </div>

@@ -85,18 +85,26 @@ export function TradingChart() {
 
     // Handle resize
     const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({
-          width: chartContainerRef.current.clientWidth,
-          height: chartContainerRef.current.clientHeight || 300,
-        })
+      if (chartContainerRef.current && chartRef.current) {
+        const { clientWidth, clientHeight } = chartContainerRef.current
+        if (clientWidth > 0 && clientHeight > 0) {
+          chart.applyOptions({
+            width: clientWidth,
+            height: clientHeight,
+          })
+        }
       }
     }
 
-    window.addEventListener('resize', handleResize)
+    // Use ResizeObserver for better resize detection
+    const resizeObserver = new ResizeObserver(handleResize)
+    resizeObserver.observe(chartContainerRef.current)
+
+    // Initial resize after mount
+    setTimeout(handleResize, 100)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      resizeObserver.disconnect()
       chart.remove()
     }
   }, [])
