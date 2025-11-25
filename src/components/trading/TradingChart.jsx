@@ -233,13 +233,13 @@ export function TradingChart() {
       </div>
 
       {/* Chart */}
-      <div className="relative flex-1 min-h-[250px]">
+      <div className="relative flex-1" style={{ minHeight: '250px' }}>
         {isLoading && (
           <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center z-10">
             <div className="text-text-secondary">Loading...</div>
           </div>
         )}
-        <div ref={chartContainerRef} className="chart-container h-full w-full" />
+        <div ref={chartContainerRef} className="absolute inset-0" />
       </div>
 
       {/* Bottom stats */}

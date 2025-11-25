@@ -30,7 +30,7 @@ function TradingPage() {
             {/* Top row: Chart + Order Book + Order Entry */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
               {/* Chart - takes most space */}
-              <div className="xl:col-span-7 min-h-[400px]">
+              <div className="xl:col-span-7 h-[520px]">
                 <TradingChart />
               </div>
 
