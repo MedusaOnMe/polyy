@@ -13,11 +13,11 @@ export function MarketStats() {
   const liquidity = selectedMarket.liquidityNum || volume * 0.2
   const endDate = selectedMarket.endDate
 
-  // Fake open interest (leveraged positions value)
-  const openInterest = liquidity * 3.5
+  // Open interest - 0 for new platform (no real positions yet)
+  const openInterest = 0
 
-  // Fake funding rate (slightly positive usually)
-  const fundingRate = FUNDING_RATE * (Math.random() > 0.3 ? 1 : -1) * (0.5 + Math.random())
+  // Funding rate - 0 for new platform
+  const fundingRate = 0
 
   const stats = [
     {
