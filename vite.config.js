@@ -30,19 +30,15 @@ function aiAnalysisPlugin() {
                 body: JSON.stringify({
                   model: 'gpt-4o',
                   tools: [{ type: 'web_search' }],
-                  input: `You are a prediction market analyst. Research and analyze this prediction market question:
+                  input: `Analyze this prediction market: "${question}"
+Current price: ${(currentPrice * 100).toFixed(1)}%
 
-"${question}"
+Search for latest news. Respond in this EXACT format only (no links, no markdown, no extra text):
 
-Current market price: ${(currentPrice * 100).toFixed(1)}% probability
-
-Search for the latest news and information about this topic. Then provide:
-1. A brief summary of recent relevant news/developments (2-3 sentences)
-2. Your probability assessment based on the research (as a percentage)
-3. Whether the current market price seems fair, overvalued, or undervalued
-4. A confidence level (low/medium/high) for your analysis
-
-Keep the response concise and actionable for traders. Format with clear sections.`,
+NEWS: [1-2 sentences on recent developments]
+AI ESTIMATE: [X]%
+VERDICT: [Undervalued/Fair/Overvalued]
+CONFIDENCE: [Low/Medium/High]`,
                 }),
               })
 

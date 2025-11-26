@@ -47,24 +47,42 @@ export function AIAnalysis() {
     }
   }
 
-  // Parse the analysis to extract key info
+  // Strip markdown links and clean up text
+  const cleanText = (text) => {
+    if (!text) return text
+    return text
+      // Remove markdown links [text](url) -> text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove bare URLs
+      .replace(/https?:\/\/[^\s)]+/g, '')
+      // Remove parentheses left over from removed URLs
+      .replace(/\(\s*\)/g, '')
+      // Clean up extra whitespace
+      .replace(/\s+/g, ' ')
+      .trim()
+  }
+
+  // Parse the structured analysis
   const parseAnalysis = (text) => {
     if (!text) return null
 
-    // Try to extract probability assessment
-    const probMatch = text.match(/(\d{1,3})%\s*probability/i) || text.match(/assessment[:\s]*(\d{1,3})%/i)
-    const probability = probMatch ? parseInt(probMatch[1]) : null
+    // Parse structured format: NEWS, AI ESTIMATE, VERDICT, CONFIDENCE
+    const newsMatch = text.match(/NEWS:\s*(.+?)(?=AI ESTIMATE:|$)/is)
+    const estimateMatch = text.match(/AI ESTIMATE:\s*(\d{1,3})%/i)
+    const verdictMatch = text.match(/VERDICT:\s*(Undervalued|Fair|Overvalued)/i)
+    const confidenceMatch = text.match(/CONFIDENCE:\s*(Low|Medium|High)/i)
 
-    // Try to detect sentiment
-    const lowerText = text.toLowerCase()
+    const news = newsMatch ? cleanText(newsMatch[1]) : null
+    const estimate = estimateMatch ? parseInt(estimateMatch[1]) : null
+    const verdict = verdictMatch ? verdictMatch[1].toLowerCase() : null
+    const confidence = confidenceMatch ? confidenceMatch[1].toLowerCase() : null
+
+    // Map verdict to sentiment
     let sentiment = 'neutral'
-    if (lowerText.includes('undervalued') || lowerText.includes('bullish')) {
-      sentiment = 'bullish'
-    } else if (lowerText.includes('overvalued') || lowerText.includes('bearish')) {
-      sentiment = 'bearish'
-    }
+    if (verdict === 'undervalued') sentiment = 'bullish'
+    else if (verdict === 'overvalued') sentiment = 'bearish'
 
-    return { probability, sentiment }
+    return { news, estimate, verdict, confidence, sentiment }
   }
 
   const parsed = parseAnalysis(analysis)
@@ -124,25 +142,25 @@ export function AIAnalysis() {
               </button>
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Sentiment indicator */}
-            {parsed && (
-              <div className="flex items-center gap-4">
-                {parsed.probability && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-text-muted">AI Est:</span>
-                    <span className="font-mono text-lg font-semibold text-text-primary">
-                      {parsed.probability}%
-                    </span>
-                  </div>
-                )}
-                <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${
+        ) : parsed ? (
+          <div className="space-y-3">
+            {/* Stats row */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {parsed.estimate && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-text-muted">AI:</span>
+                  <span className="font-mono text-base font-semibold text-text-primary">
+                    {parsed.estimate}%
+                  </span>
+                </div>
+              )}
+              {parsed.verdict && (
+                <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
                   parsed.sentiment === 'bullish'
                     ? 'bg-accent-green/15 text-accent-green'
                     : parsed.sentiment === 'bearish'
                     ? 'bg-accent-red/15 text-accent-red'
-                    : 'bg-bg-elevated text-text-muted'
+                    : 'bg-bg-elevated text-text-secondary'
                 }`}>
                   {parsed.sentiment === 'bullish' ? (
                     <TrendingUp className="w-3 h-3" />
@@ -151,20 +169,31 @@ export function AIAnalysis() {
                   ) : (
                     <Minus className="w-3 h-3" />
                   )}
-                  {parsed.sentiment.charAt(0).toUpperCase() + parsed.sentiment.slice(1)}
+                  {parsed.verdict.charAt(0).toUpperCase() + parsed.verdict.slice(1)}
                 </div>
-              </div>
-            )}
-
-            {/* Analysis text */}
-            <div className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">
-              {analysis}
+              )}
+              {parsed.confidence && (
+                <span className="text-xs text-text-muted">
+                  {parsed.confidence.charAt(0).toUpperCase() + parsed.confidence.slice(1)} confidence
+                </span>
+              )}
             </div>
+
+            {/* News */}
+            {parsed.news && (
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {parsed.news}
+              </p>
+            )}
 
             {/* Disclaimer */}
             <p className="text-xs text-text-muted pt-2 border-t border-border">
-              AI analysis is for informational purposes only. Do your own research.
+              AI analysis is for informational purposes only.
             </p>
+          </div>
+        ) : (
+          <div className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">
+            {analysis}
           </div>
         )}
       </div>

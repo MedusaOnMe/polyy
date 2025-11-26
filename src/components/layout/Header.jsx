@@ -2,23 +2,18 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { LogOut, User, Menu, X, Plus, Key, Eye, EyeOff, Copy, AlertTriangle, ChevronDown, TrendingUp } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { useMarket } from '../../context/MarketContext'
 import { AuthModal } from '../auth/AuthModal'
-import { MarketsModal } from '../trading/MarketsModal'
 import { Modal } from '../ui/Modal'
 import { useToast } from '../../context/ToastContext'
-import { formatCents } from '../../utils/formatters'
 
 export function Header() {
   const { user, isAuthenticated, logout, exportPrivateKey } = useAuth()
-  const { selectedMarket } = useMarket()
   const toast = useToast()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
-  const [showMarketsModal, setShowMarketsModal] = useState(false)
   const [exportPassword, setExportPassword] = useState('')
   const [revealedKey, setRevealedKey] = useState('')
   const [showKey, setShowKey] = useState(false)
@@ -33,15 +28,6 @@ export function Header() {
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [showUserMenu])
-
-  // Close markets modal on ESC
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') setShowMarketsModal(false)
-    }
-    window.addEventListener('keydown', handleEsc)
-    return () => window.removeEventListener('keydown', handleEsc)
-  }, [])
 
   const handleExportKey = async () => {
     try {
@@ -101,37 +87,6 @@ export function Header() {
               </a>
             </nav>
 
-            {/* Divider */}
-            <div className="hidden md:block w-px h-6 bg-border mx-2" />
-
-            {/* Markets Button */}
-            <button
-              onClick={() => setShowMarketsModal(true)}
-              className="hidden sm:flex items-center gap-2 px-3 py-2 bg-bg-elevated hover:bg-border/50 border border-border rounded-lg transition-all"
-            >
-              {selectedMarket ? (
-                <>
-                  <span className="text-sm text-text-secondary max-w-[180px] truncate">
-                    {selectedMarket.question}
-                  </span>
-                  <span className="text-sm font-mono font-semibold text-accent-green">
-                    {formatCents(selectedMarket.yesPrice || 0.5)}
-                  </span>
-                </>
-              ) : (
-                <span className="text-sm text-text-secondary">Select Market</span>
-              )}
-              <ChevronDown className="w-4 h-4 text-text-muted" />
-            </button>
-
-            {/* Mobile Markets Button */}
-            <button
-              onClick={() => setShowMarketsModal(true)}
-              className="sm:hidden flex items-center gap-1.5 px-3 py-2 bg-bg-elevated border border-border rounded-lg"
-            >
-              <TrendingUp className="w-4 h-4 text-accent-green" />
-              <span className="text-sm text-text-primary">Markets</span>
-            </button>
           </div>
 
           {/* Right side */}
@@ -260,9 +215,6 @@ export function Header() {
           </nav>
         )}
       </header>
-
-      {/* Markets Modal */}
-      <MarketsModal isOpen={showMarketsModal} onClose={() => setShowMarketsModal(false)} />
 
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
 

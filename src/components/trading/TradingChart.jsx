@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createChart } from 'lightweight-charts'
+import { ChevronDown, Search } from 'lucide-react'
 import { useMarket } from '../../context/MarketContext'
 import { TIMEFRAMES } from '../../utils/constants'
 import { formatCents, formatChange } from '../../utils/formatters'
@@ -9,9 +10,13 @@ export function TradingChart() {
   const chartRef = useRef(null)
   const seriesRef = useRef(null)
   const [chartReady, setChartReady] = useState(false)
+  const [showMarketDropdown, setShowMarketDropdown] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const {
+    markets,
     selectedMarket,
+    selectMarket,
     priceHistory,
     isLoading,
     selectedTimeframe,
@@ -19,6 +24,11 @@ export function TradingChart() {
     getCurrentPrice,
     get24hChange,
   } = useMarket()
+
+  // Filter markets by search
+  const filteredMarkets = markets.filter(m =>
+    m.question.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   // Initialize chart with modern theme
   useEffect(() => {
@@ -173,10 +183,75 @@ export function TradingChart() {
       <div className="px-4 py-3 border-b border-border">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-text-secondary mb-1 truncate">
-              {selectedMarket.question}
-            </p>
-            <div className="flex items-baseline gap-3">
+            {/* Market selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowMarketDropdown(!showMarketDropdown)}
+                className="flex items-center gap-2 text-left group"
+              >
+                <span className="text-base text-text-primary font-semibold truncate max-w-[500px] group-hover:text-accent-blue transition-colors">
+                  {selectedMarket.question}
+                </span>
+                <ChevronDown className={`w-8 h-8 text-text-primary transition-transform ${showMarketDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Market dropdown */}
+              {showMarketDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowMarketDropdown(false)}
+                  />
+                  <div className="absolute top-full left-0 mt-2 w-[600px] max-h-[500px] bg-bg-secondary border border-border rounded-lg shadow-xl z-50 overflow-hidden">
+                    {/* Search */}
+                    <div className="p-4 border-b border-border">
+                      <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search markets..."
+                          autoFocus
+                          className="w-full bg-bg-primary border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-blue focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    {/* Markets list */}
+                    <div className="max-h-[420px] overflow-y-auto">
+                      {filteredMarkets.map((market, index) => (
+                        <button
+                          key={market.id}
+                          onClick={() => {
+                            selectMarket(market)
+                            setShowMarketDropdown(false)
+                            setSearchQuery('')
+                          }}
+                          className={`w-full px-4 py-4 text-left hover:bg-bg-elevated transition-colors flex items-center justify-between gap-6 ${
+                            selectedMarket?.id === market.id ? 'bg-accent-blue/10 border-l-2 border-l-accent-blue' : ''
+                          } ${index !== filteredMarkets.length - 1 ? 'border-b border-border/50' : ''}`}
+                        >
+                          <span className="text-sm text-text-primary leading-relaxed flex-1">
+                            {market.question}
+                          </span>
+                          <span className="font-mono text-base font-semibold text-accent-green shrink-0 bg-accent-green/10 px-2.5 py-1 rounded">
+                            {formatCents(market.yesPrice || 0.5)}
+                          </span>
+                        </button>
+                      ))}
+                      {filteredMarkets.length === 0 && (
+                        <div className="px-4 py-12 text-center text-sm text-text-muted">
+                          No markets found
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Price */}
+            <div className="flex items-baseline gap-3 mt-1">
               <span className={`text-3xl font-mono font-semibold ${isPositive ? 'text-accent-green' : 'text-accent-red'}`}>
                 {formatCents(currentPrice)}
               </span>
@@ -189,23 +264,23 @@ export function TradingChart() {
               </span>
             </div>
           </div>
-        </div>
 
-        {/* Timeframe selector */}
-        <div className="flex items-center gap-1 mt-3">
-          {TIMEFRAMES.map((tf) => (
-            <button
-              key={tf.label}
-              onClick={() => setSelectedTimeframe(tf.interval)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                selectedTimeframe === tf.interval
-                  ? 'text-text-primary bg-bg-elevated'
-                  : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated/50'
-              }`}
-            >
-              {tf.label}
-            </button>
-          ))}
+          {/* Timeframe selector - moved to right side */}
+          <div className="flex items-center gap-1">
+            {TIMEFRAMES.map((tf) => (
+              <button
+                key={tf.label}
+                onClick={() => setSelectedTimeframe(tf.interval)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  selectedTimeframe === tf.interval
+                    ? 'text-text-primary bg-bg-elevated'
+                    : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated/50'
+                }`}
+              >
+                {tf.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
