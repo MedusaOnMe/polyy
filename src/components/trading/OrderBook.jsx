@@ -25,39 +25,42 @@ export function OrderBook() {
 
   if (!selectedMarket) {
     return (
-      <div className="bg-term-dark border border-term-border h-full flex items-center justify-center">
-        <div className="text-xs text-term-text-dim">
-          &gt; NO_DATA_
+      <div className="bg-bg-secondary border border-border rounded-lg h-full flex items-center justify-center">
+        <div className="text-sm text-text-muted">
+          No market selected
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-term-dark border border-term-border h-full flex flex-col">
+    <div className="bg-bg-secondary border border-border rounded-lg h-full flex flex-col">
       {/* Header */}
-      <div className="px-3 py-2 border-b border-term-border">
+      <div className="px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-term-text-dim uppercase tracking-wider">ORDER_BOOK</span>
-          <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium text-text-primary">Order Book</span>
+          <div className="flex items-center gap-2">
             <div className="status-online" />
-            <span className="text-xs text-term-text-dim">LIVE</span>
+            <span className="text-xs text-text-muted">Live</span>
           </div>
         </div>
       </div>
 
       {/* Column headers */}
-      <div className="px-3 py-1.5 border-b border-term-border">
-        <div className="flex justify-between text-xs text-term-text-dim uppercase">
-          <span>PRICE</span>
-          <span>SIZE</span>
-          <span>TOTAL</span>
+      <div className="px-4 py-2 border-b border-border">
+        <div className="flex justify-between text-xs text-text-muted">
+          <span>Price</span>
+          <span>Size</span>
+          <span>Total</span>
         </div>
       </div>
 
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-xs text-term-text-dim loading-dots">LOADING</span>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-accent-blue border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm text-text-secondary">Loading...</span>
+          </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -75,13 +78,13 @@ export function OrderBook() {
           </div>
 
           {/* Spread / Current price */}
-          <div className="px-3 py-2 bg-term-black border-y border-term-border">
+          <div className="px-4 py-3 bg-bg-primary border-y border-border">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-term-green term-glow">
+              <span className="text-xl font-mono font-semibold text-accent-green">
                 {formatCents(currentPrice)}
               </span>
-              <span className="text-xs text-term-text-dim">
-                SPR: {formatCents(spread)}
+              <span className="text-xs text-text-muted">
+                Spread: {formatCents(spread)}
               </span>
             </div>
           </div>
@@ -102,17 +105,17 @@ export function OrderBook() {
       )}
 
       {/* Footer stats */}
-      <div className="px-3 py-2 border-t border-term-border">
-        <div className="grid grid-cols-2 gap-2 text-xs">
+      <div className="px-4 py-3 border-t border-border">
+        <div className="grid grid-cols-2 gap-4 text-xs">
           <div>
-            <span className="text-term-text-dim">BID VOL</span>
-            <p className="text-term-green">
+            <span className="text-text-muted">Bid Volume</span>
+            <p className="font-mono text-accent-green">
               {formatCompact(bids.reduce((acc, b) => acc + b.size * b.price, 0))}
             </p>
           </div>
           <div className="text-right">
-            <span className="text-term-text-dim">ASK VOL</span>
-            <p className="text-term-red">
+            <span className="text-text-muted">Ask Volume</span>
+            <p className="font-mono text-accent-red">
               {formatCompact(asks.reduce((acc, a) => acc + a.size * (1 - a.price), 0))}
             </p>
           </div>
@@ -127,7 +130,7 @@ function OrderRow({ price, size, maxSize, side }) {
   const total = price * size
 
   return (
-    <div className="relative px-3 py-1 hover:bg-term-gray cursor-pointer">
+    <div className="relative px-4 py-1.5 hover:bg-bg-elevated cursor-pointer transition-colors">
       {/* Depth bar */}
       <div
         className={`absolute inset-y-0 ${side === 'bid' ? 'left-0 depth-bar-green' : 'right-0 depth-bar-red'}`}
@@ -135,12 +138,12 @@ function OrderRow({ price, size, maxSize, side }) {
       />
 
       {/* Content */}
-      <div className="relative flex justify-between text-xs">
-        <span className={side === 'bid' ? 'text-term-green' : 'text-term-red'}>
+      <div className="relative flex justify-between text-xs font-mono">
+        <span className={side === 'bid' ? 'text-accent-green' : 'text-accent-red'}>
           {formatCents(price)}
         </span>
-        <span className="text-term-text">{formatNumber(size, 0)}</span>
-        <span className="text-term-text-dim">{formatNumber(total, 0)}</span>
+        <span className="text-text-primary">{formatNumber(size, 0)}</span>
+        <span className="text-text-muted">{formatNumber(total, 0)}</span>
       </div>
     </div>
   )

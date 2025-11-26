@@ -22,50 +22,55 @@ export function MarketsModal({ isOpen, onClose }) {
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-term-black/90 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="absolute inset-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:top-16 md:bottom-auto md:w-full md:max-w-2xl bg-term-dark border border-term-border flex flex-col max-h-[calc(100vh-8rem)]">
+      <div className="absolute inset-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:top-16 md:bottom-auto md:w-full md:max-w-2xl bg-bg-secondary border border-border rounded-lg flex flex-col max-h-[calc(100vh-8rem)]">
         {/* Header */}
-        <div className="px-4 py-3 border-b border-term-border flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-term-green text-sm font-bold">&gt; SELECT_MARKET</span>
-            <span className="text-[10px] text-term-text-dim">[{markets.length} AVAILABLE]</span>
+            <span className="text-base font-semibold text-text-primary">Select Market</span>
+            <span className="text-xs text-text-muted px-2 py-0.5 bg-bg-elevated rounded">
+              {markets.length} available
+            </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-term-gray transition-colors"
+            className="p-1.5 hover:bg-bg-elevated rounded-md transition-colors"
           >
-            <X className="w-4 h-4 text-term-text-dim" />
+            <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
 
         {/* Search */}
-        <div className="px-4 py-3 border-b border-term-border">
+        <div className="px-5 py-3 border-b border-border">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-term-text-dim" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
               type="text"
               placeholder="Search markets..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
-              className="w-full bg-term-black border border-term-border pl-10 pr-4 py-2 text-sm text-term-text placeholder:text-term-text-dim"
+              className="w-full bg-bg-primary border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted"
             />
           </div>
         </div>
 
         {/* Markets Grid */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-5">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <span className="text-sm text-term-text-dim loading-dots">LOADING MARKETS</span>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-accent-blue border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-text-secondary">Loading markets...</span>
+              </div>
             </div>
           ) : filteredMarkets.length === 0 ? (
             <div className="flex items-center justify-center py-12">
-              <span className="text-sm text-term-text-dim">NO MARKETS FOUND</span>
+              <span className="text-sm text-text-muted">No markets found</span>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -82,11 +87,11 @@ export function MarketsModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t border-term-border flex items-center justify-between text-[10px] text-term-text-dim">
+        <div className="px-5 py-3 border-t border-border flex items-center justify-between text-xs text-text-muted">
           <span>Press ESC to close</span>
           <div className="flex items-center gap-2">
             <div className="status-online" />
-            <span>LIVE DATA</span>
+            <span>Live data</span>
           </div>
         </div>
       </div>
@@ -106,34 +111,34 @@ function MarketCard({ market, isSelected, onSelect }) {
   return (
     <button
       onClick={onSelect}
-      className={`text-left p-3 border transition-all ${
+      className={`text-left p-4 border rounded-lg transition-all ${
         isSelected
-          ? 'border-term-green bg-term-green/10'
-          : 'border-term-border hover:border-term-green/50 bg-term-dark hover:bg-term-gray/50'
+          ? 'border-accent-green bg-accent-green/5'
+          : 'border-border hover:border-border-light bg-bg-elevated/50 hover:bg-bg-elevated'
       }`}
     >
       {/* Question */}
-      <p className={`text-xs line-clamp-2 mb-3 min-h-[2.5rem] ${
-        isSelected ? 'text-term-green' : 'text-term-text'
+      <p className={`text-sm line-clamp-2 mb-3 min-h-[2.5rem] ${
+        isSelected ? 'text-accent-green' : 'text-text-primary'
       }`}>
         {market.question}
       </p>
 
       {/* Stats Row */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* Price */}
           <div>
-            <div className="text-[10px] text-term-text-dim mb-0.5">PRICE</div>
-            <span className={`text-sm font-bold ${isSelected ? 'text-term-green term-glow' : 'text-term-green'}`}>
+            <div className="text-xs text-text-muted mb-0.5">Price</div>
+            <span className={`text-sm font-mono font-semibold ${isSelected ? 'text-accent-green' : 'text-accent-green'}`}>
               {formatCents(yesPrice)}
             </span>
           </div>
 
           {/* Change */}
           <div>
-            <div className="text-[10px] text-term-text-dim mb-0.5">24H</div>
-            <div className={`flex items-center gap-1 text-xs ${isPositive ? 'text-term-green' : 'text-term-red'}`}>
+            <div className="text-xs text-text-muted mb-0.5">24h</div>
+            <div className={`flex items-center gap-1 text-xs font-mono ${isPositive ? 'text-accent-green' : 'text-accent-red'}`}>
               {isPositive ? (
                 <TrendingUp className="w-3 h-3" />
               ) : (
@@ -146,23 +151,23 @@ function MarketCard({ market, isSelected, onSelect }) {
 
         {/* Volume */}
         <div className="text-right">
-          <div className="text-[10px] text-term-text-dim mb-0.5">VOL</div>
-          <span className="text-xs text-term-text">{formatCompact(volume)}</span>
+          <div className="text-xs text-text-muted mb-0.5">Volume</div>
+          <span className="text-xs font-mono text-text-secondary">{formatCompact(volume)}</span>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="mt-3 h-1 bg-term-black overflow-hidden">
+      <div className="mt-3 h-1.5 bg-bg-primary rounded-full overflow-hidden">
         <div
-          className={`h-full transition-all ${isSelected ? 'bg-term-green' : 'bg-term-green/50'}`}
+          className={`h-full rounded-full transition-all ${isSelected ? 'bg-accent-green' : 'bg-accent-green/60'}`}
           style={{ width: `${yesPrice * 100}%` }}
         />
       </div>
 
       {/* Selected indicator */}
       {isSelected && (
-        <div className="mt-2 text-[10px] text-term-green text-center">
-          CURRENTLY VIEWING
+        <div className="mt-2 text-xs text-accent-green text-center font-medium">
+          Currently viewing
         </div>
       )}
     </button>

@@ -1,5 +1,6 @@
 import { useMarket } from '../../context/MarketContext'
 import { formatCompact, formatDate, formatPercent } from '../../utils/formatters'
+import { Clock, TrendingUp, DollarSign, Droplets, Calendar, Percent } from 'lucide-react'
 
 export function MarketStats() {
   const { selectedMarket } = useMarket()
@@ -18,28 +19,34 @@ export function MarketStats() {
   const fundingRate = 0
 
   const stats = [
-    { label: '24H_VOL', value: formatCompact(volume24h), color: 'text-term-cyan' },
-    { label: 'OI', value: formatCompact(openInterest), color: 'text-term-green' },
-    { label: 'TOTAL_VOL', value: formatCompact(volume), color: 'text-term-text' },
-    { label: 'LIQUIDITY', value: formatCompact(liquidity), color: 'text-term-amber' },
-    { label: 'FUNDING_8H', value: formatPercent(fundingRate, 4), color: fundingRate >= 0 ? 'text-term-green' : 'text-term-red' },
-    { label: 'RESOLUTION', value: endDate ? formatDate(endDate) : 'TBD', color: 'text-term-text-dim' },
+    { label: '24h Volume', value: formatCompact(volume24h), icon: TrendingUp, color: 'text-accent-blue' },
+    { label: 'Open Interest', value: formatCompact(openInterest), icon: DollarSign, color: 'text-accent-green' },
+    { label: 'Total Volume', value: formatCompact(volume), icon: TrendingUp, color: 'text-text-primary' },
+    { label: 'Liquidity', value: formatCompact(liquidity), icon: Droplets, color: 'text-accent-amber' },
+    { label: 'Funding (8h)', value: formatPercent(fundingRate, 4), icon: Percent, color: fundingRate >= 0 ? 'text-accent-green' : 'text-accent-red' },
+    { label: 'Resolution', value: endDate ? formatDate(endDate) : 'TBD', icon: Calendar, color: 'text-text-secondary' },
   ]
 
   return (
-    <div className="bg-term-dark border border-term-border p-3">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-term-text-dim uppercase tracking-wider">MARKET_STATS</span>
+    <div className="bg-bg-secondary border border-border rounded-lg p-4">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-medium text-text-primary">Market Stats</span>
         <FundingCountdown />
       </div>
 
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-        {stats.map((stat, i) => (
-          <div key={i}>
-            <span className="text-xs text-term-text-dim">{stat.label}</span>
-            <p className={`text-sm font-medium ${stat.color}`}>{stat.value}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+        {stats.map((stat, i) => {
+          const Icon = stat.icon
+          return (
+            <div key={i}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <Icon className="w-3.5 h-3.5 text-text-muted" />
+                <span className="text-xs text-text-muted">{stat.label}</span>
+              </div>
+              <p className={`text-sm font-mono font-medium ${stat.color}`}>{stat.value}</p>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -54,8 +61,9 @@ function FundingCountdown() {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-term-text-dim">NEXT_FUNDING:</span>
-      <span className="text-sm text-term-green">
+      <Clock className="w-3.5 h-3.5 text-text-muted" />
+      <span className="text-xs text-text-muted">Next funding:</span>
+      <span className="text-sm font-mono text-accent-green">
         {String(hoursLeft).padStart(2, '0')}:{String(minutesLeft).padStart(2, '0')}:00
       </span>
     </div>

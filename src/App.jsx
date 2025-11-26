@@ -5,52 +5,62 @@ import { MarketProvider } from './context/MarketContext'
 import { PositionProvider } from './context/PositionContext'
 import { ToastProvider } from './context/ToastContext'
 import { Header } from './components/layout/Header'
+import { Ticker } from './components/layout/Ticker'
 import { TradingChart } from './components/trading/TradingChart'
 import { OrderBook } from './components/trading/OrderBook'
 import { OrderEntry } from './components/trading/OrderEntry'
 import { MarketStats } from './components/trading/MarketStats'
 import { PositionsPanel } from './components/positions/PositionsPanel'
+import { AIAnalysis } from './components/trading/AIAnalysis'
 import { ToastContainer } from './components/ui/Toast'
 import { LoadingScreen } from './components/ui/LoadingScreen'
 import { Docs } from './pages/Docs'
 
 function TradingPage() {
   return (
-    <div className="min-h-screen bg-term-black">
-      {/* CRT Scanline overlay */}
-      <div className="crt-overlay" />
-
+    <div className="min-h-screen bg-bg-primary">
       <Header />
+      <Ticker />
 
-      {/* Main content - full width now */}
-      <main className="h-[calc(100vh-49px)] overflow-auto">
-        <div className="p-2 lg:p-3">
-          {/* Two column layout */}
-          <div className="flex flex-col xl:flex-row gap-2 lg:gap-3">
+      {/* Main content */}
+      <main className="h-[calc(100vh-56px-37px)] overflow-auto">
+        <div className="p-3 lg:p-4">
+          {/* Main layout: Left section + Order Entry */}
+          <div className="flex flex-col xl:flex-row gap-3 lg:gap-4">
 
-            {/* Left Column: Chart + Stats + Positions */}
-            <div className="flex-1 flex flex-col gap-2 lg:gap-3 min-w-0">
-              {/* Chart - Main focus */}
-              <div className="h-[500px] lg:h-[580px]">
-                <TradingChart />
+            {/* Left Section: Order Book + Chart + Stats + Positions */}
+            <div className="flex-1 flex flex-col gap-3 lg:gap-4 min-w-0">
+              {/* Top row: Order Book + Chart */}
+              <div className="flex flex-col xl:flex-row gap-3 lg:gap-4">
+                {/* Order Book - left of chart on desktop */}
+                <div className="hidden xl:block xl:w-[280px]">
+                  <div className="h-[600px]">
+                    <OrderBook />
+                  </div>
+                </div>
+
+                {/* Chart */}
+                <div className="flex-1 h-[500px] lg:h-[600px]">
+                  <TradingChart />
+                </div>
               </div>
 
-              {/* Market Stats - Horizontal bar */}
+              {/* Market Stats - spans full width */}
               <MarketStats />
 
-              {/* Positions Panel */}
+              {/* Positions Panel - spans full width */}
               <PositionsPanel />
+
+              {/* AI Analysis - spans full width */}
+              <AIAnalysis />
             </div>
 
-            {/* Right Column: Order Entry + Order Book stacked */}
-            <div className="xl:w-[380px] flex flex-col gap-2 lg:gap-3">
-              {/* Order Entry on top */}
-              <div className="h-auto">
-                <OrderEntry />
-              </div>
+            {/* Right Column: Order Entry */}
+            <div className="xl:w-[320px] flex flex-col gap-3 lg:gap-4">
+              <OrderEntry />
 
-              {/* Order Book below */}
-              <div className="h-[380px] xl:h-[400px]">
+              {/* Order Book - shown on mobile/tablet only */}
+              <div className="xl:hidden min-h-[350px]">
                 <OrderBook />
               </div>
             </div>

@@ -20,7 +20,7 @@ export function TradingChart() {
     get24hChange,
   } = useMarket()
 
-  // Initialize chart with terminal theme
+  // Initialize chart with modern theme
   useEffect(() => {
     if (!chartContainerRef.current || !selectedMarket) {
       return
@@ -28,40 +28,40 @@ export function TradingChart() {
 
     const chart = createChart(chartContainerRef.current, {
       layout: {
-        background: { type: 'solid', color: '#0a0a0a' },
-        textColor: '#606060',
-        fontFamily: 'IBM Plex Mono, monospace',
+        background: { type: 'solid', color: '#161b22' },
+        textColor: '#8b949e',
+        fontFamily: 'Inter, sans-serif',
       },
       grid: {
-        vertLines: { color: '#1a1a1a' },
-        horzLines: { color: '#1a1a1a' },
+        vertLines: { color: '#21262d' },
+        horzLines: { color: '#21262d' },
       },
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight || 300,
       crosshair: {
         mode: 1,
         vertLine: {
-          color: '#00ff41',
+          color: '#3b82f6',
           width: 1,
-          style: 2,
-          labelBackgroundColor: '#00ff41',
+          style: 0,
+          labelBackgroundColor: '#3b82f6',
         },
         horzLine: {
-          color: '#00ff41',
+          color: '#3b82f6',
           width: 1,
-          style: 2,
-          labelBackgroundColor: '#00ff41',
+          style: 0,
+          labelBackgroundColor: '#3b82f6',
         },
       },
       rightPriceScale: {
-        borderColor: '#2a2a2a',
+        borderColor: '#30363d',
         scaleMargins: {
           top: 0.1,
           bottom: 0.1,
         },
       },
       timeScale: {
-        borderColor: '#2a2a2a',
+        borderColor: '#30363d',
         timeVisible: true,
         secondsVisible: false,
       },
@@ -69,12 +69,12 @@ export function TradingChart() {
 
     chartRef.current = chart
 
-    // Create area series with terminal green
+    // Create area series with modern green
     const areaSeries = chart.addAreaSeries({
-      lineColor: '#00ff41',
-      topColor: 'rgba(0, 255, 65, 0.2)',
-      bottomColor: 'rgba(0, 255, 65, 0.0)',
-      lineWidth: 1,
+      lineColor: '#22c55e',
+      topColor: 'rgba(34, 197, 94, 0.15)',
+      bottomColor: 'rgba(34, 197, 94, 0.0)',
+      lineWidth: 2,
       priceFormat: {
         type: 'price',
         precision: 2,
@@ -142,9 +142,9 @@ export function TradingChart() {
         : true
 
       seriesRef.current.applyOptions({
-        lineColor: isPositive ? '#00ff41' : '#ff0040',
-        topColor: isPositive ? 'rgba(0, 255, 65, 0.2)' : 'rgba(255, 0, 64, 0.2)',
-        bottomColor: isPositive ? 'rgba(0, 255, 65, 0.0)' : 'rgba(255, 0, 64, 0.0)',
+        lineColor: isPositive ? '#22c55e' : '#ef4444',
+        topColor: isPositive ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+        bottomColor: isPositive ? 'rgba(34, 197, 94, 0.0)' : 'rgba(239, 68, 68, 0.0)',
       })
 
       chartRef.current.timeScale().fitContent()
@@ -159,28 +159,32 @@ export function TradingChart() {
 
   if (!selectedMarket) {
     return (
-      <div className="bg-term-dark border border-term-border h-full flex items-center justify-center">
-        <div className="text-xs text-term-text-dim">
-          &gt; SELECT MARKET_
+      <div className="bg-bg-secondary border border-border rounded-lg h-full flex items-center justify-center">
+        <div className="text-sm text-text-muted">
+          Select a market to start trading
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-term-dark border border-term-border overflow-hidden h-full flex flex-col">
+    <div className="bg-bg-secondary border border-border rounded-lg overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div className="px-3 py-2 border-b border-term-border">
+      <div className="px-4 py-3 border-b border-border">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-term-text-dim uppercase tracking-wider mb-1 truncate">
+            <p className="text-sm text-text-secondary mb-1 truncate">
               {selectedMarket.question}
             </p>
             <div className="flex items-baseline gap-3">
-              <span className={`text-3xl font-bold ${isPositive ? 'text-term-green term-glow' : 'text-term-red term-glow-red'}`}>
+              <span className={`text-3xl font-mono font-semibold ${isPositive ? 'text-accent-green' : 'text-accent-red'}`}>
                 {formatCents(currentPrice)}
               </span>
-              <span className={`text-base ${isPositive ? 'text-term-green' : 'text-term-red'}`}>
+              <span className={`text-sm font-medium px-2 py-0.5 rounded ${
+                isPositive
+                  ? 'text-accent-green bg-accent-green/10'
+                  : 'text-accent-red bg-accent-red/10'
+              }`}>
                 {formatChange(change24h)}
               </span>
             </div>
@@ -193,10 +197,10 @@ export function TradingChart() {
             <button
               key={tf.label}
               onClick={() => setSelectedTimeframe(tf.interval)}
-              className={`px-2.5 py-1.5 text-xs transition-colors ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 selectedTimeframe === tf.interval
-                  ? 'text-term-green bg-term-green/10'
-                  : 'text-term-text-dim hover:text-term-green'
+                  ? 'text-text-primary bg-bg-elevated'
+                  : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated/50'
               }`}
             >
               {tf.label}
@@ -208,29 +212,32 @@ export function TradingChart() {
       {/* Chart */}
       <div className="relative flex-1" style={{ minHeight: '250px' }}>
         {isLoading && (
-          <div className="absolute inset-0 bg-term-dark/80 flex items-center justify-center z-10">
-            <span className="text-xs text-term-text-dim loading-dots">LOADING</span>
+          <div className="absolute inset-0 bg-bg-secondary/80 flex items-center justify-center z-10">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-accent-blue border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm text-text-secondary">Loading...</span>
+            </div>
           </div>
         )}
         <div ref={chartContainerRef} className="absolute inset-0" />
       </div>
 
       {/* Bottom stats */}
-      <div className="px-3 py-2 border-t border-term-border flex items-center justify-between text-xs">
-        <div className="flex items-center gap-4 text-term-text-dim">
+      <div className="px-4 py-2.5 border-t border-border flex items-center justify-between text-xs">
+        <div className="flex items-center gap-4 text-text-secondary">
           <span>
-            H: <span className="text-term-green">
+            High: <span className="font-mono text-accent-green">
               {formatCents(priceHistory.length > 0 ? Math.max(...priceHistory.map(p => p.value)) : currentPrice)}
             </span>
           </span>
           <span>
-            L: <span className="text-term-red">
+            Low: <span className="font-mono text-accent-red">
               {formatCents(priceHistory.length > 0 ? Math.min(...priceHistory.map(p => p.value)) : currentPrice)}
             </span>
           </span>
         </div>
-        <span className="text-term-text-dim">
-          {priceHistory.length} PTS
+        <span className="text-text-muted">
+          {priceHistory.length} data points
         </span>
       </div>
     </div>

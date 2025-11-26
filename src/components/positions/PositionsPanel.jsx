@@ -37,16 +37,16 @@ export function PositionsPanel() {
 
   if (!isAuthenticated) {
     return (
-      <div className="bg-term-dark border border-term-border p-8">
-        <div className="text-center text-sm text-term-text-dim">
-          &gt; CONNECT_WALLET_TO_VIEW_POSITIONS_
+      <div className="bg-bg-secondary border border-border rounded-lg p-8">
+        <div className="text-center text-sm text-text-muted">
+          Connect your wallet to view positions
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-term-dark border border-term-border">
+    <div className="bg-bg-secondary border border-border rounded-lg">
       <Tabs tabs={tabs} defaultTab="positions" />
     </div>
   )
@@ -106,16 +106,16 @@ function PositionsList() {
 
   if (positions.length === 0) {
     return (
-      <div className="p-8 text-center text-term-text-dim">
-        <TrendingUp className="w-6 h-6 mx-auto mb-2 opacity-50" />
-        <p className="text-sm">&gt; NO_OPEN_POSITIONS_</p>
+      <div className="p-8 text-center text-text-muted">
+        <TrendingUp className="w-8 h-8 mx-auto mb-3 opacity-30" />
+        <p className="text-sm font-medium">No open positions</p>
         <p className="text-xs mt-1">Open a trade to see it here</p>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-term-border">
+    <div className="divide-y divide-border">
       {positions.map((position) => {
         const currentPrice = prices[position.marketId] || position.entryPrice
         const pnl = getPositionPnL(position, currentPrice)
@@ -129,62 +129,62 @@ function PositionsList() {
         const isNearLiquidation = priceToLiq < 0.05
 
         return (
-          <div key={position.id} className="p-3 hover:bg-term-gray/30 transition-colors">
+          <div key={position.id} className="p-4 hover:bg-bg-elevated/50 transition-colors">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-1.5 py-0.5 text-xs font-medium ${
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={`px-2 py-1 text-xs font-medium rounded ${
                     position.side === 'YES'
-                      ? 'bg-term-green/20 text-term-green'
-                      : 'bg-term-red/20 text-term-red'
+                      ? 'bg-accent-green/15 text-accent-green'
+                      : 'bg-accent-red/15 text-accent-red'
                   }`}>
-                    {position.side} {position.leverage}x
+                    {position.side === 'YES' ? 'Long' : 'Short'} {position.leverage}x
                   </span>
                   {isNearLiquidation && (
-                    <span className="flex items-center gap-1 text-xs text-term-amber">
+                    <span className="flex items-center gap-1 px-2 py-1 text-xs bg-accent-amber/15 text-accent-amber rounded">
                       <AlertTriangle className="w-3 h-3" />
-                      LIQ_RISK
+                      At risk
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-term-text truncate">
+                <p className="text-sm text-text-primary truncate">
                   {position.marketQuestion}
                 </p>
               </div>
 
               <div className="text-right">
-                <p className={`text-base font-bold ${pnl >= 0 ? 'text-term-green' : 'text-term-red'}`}>
+                <p className={`text-lg font-mono font-semibold ${pnl >= 0 ? 'text-accent-green' : 'text-accent-red'}`}>
                   {pnlFormatted.text}
                 </p>
-                <p className={`text-xs ${pnl >= 0 ? 'text-term-green' : 'text-term-red'}`}>
+                <p className={`text-xs font-mono ${pnl >= 0 ? 'text-accent-green' : 'text-accent-red'}`}>
                   {roi >= 0 ? '+' : ''}{roi.toFixed(2)}%
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-4 mt-2 text-xs">
+            <div className="grid grid-cols-4 gap-4 mt-3 text-xs">
               <div>
-                <span className="text-term-text-dim">SIZE</span>
-                <p className="text-term-text">{formatPrice(position.size)}</p>
+                <span className="text-text-muted">Size</span>
+                <p className="font-mono text-text-primary">{formatPrice(position.size)}</p>
               </div>
               <div>
-                <span className="text-term-text-dim">ENTRY</span>
-                <p className="text-term-text">{formatCents(position.entryPrice)}</p>
+                <span className="text-text-muted">Entry</span>
+                <p className="font-mono text-text-primary">{formatCents(position.entryPrice)}</p>
               </div>
               <div>
-                <span className="text-term-text-dim">MARK</span>
-                <p className={currentPrice > position.entryPrice ? 'text-term-green' : 'text-term-red'}>
+                <span className="text-text-muted">Mark</span>
+                <p className={`font-mono ${currentPrice > position.entryPrice ? 'text-accent-green' : 'text-accent-red'}`}>
                   {formatCents(currentPrice)}
                 </p>
               </div>
               <div>
-                <span className="text-term-text-dim">LIQ</span>
-                <p className="text-term-red">{formatCents(position.liquidationPrice)}</p>
+                <span className="text-text-muted">Liquidation</span>
+                <p className="font-mono text-accent-red">{formatCents(position.liquidationPrice)}</p>
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-term-border">
-              <span className="text-xs text-term-text-dim">
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+              <span className="text-xs text-text-muted">
                 {formatTimeAgo(position.openedAt)}
               </span>
               <Button
@@ -194,7 +194,7 @@ function PositionsList() {
                 size="sm"
               >
                 <X className="w-3 h-3" />
-                CLOSE
+                Close
               </Button>
             </div>
           </div>
@@ -224,30 +224,30 @@ function OrdersList() {
 
   if (orders.length === 0) {
     return (
-      <div className="p-8 text-center text-term-text-dim">
-        <Clock className="w-6 h-6 mx-auto mb-2 opacity-50" />
-        <p className="text-sm">&gt; NO_OPEN_ORDERS_</p>
+      <div className="p-8 text-center text-text-muted">
+        <Clock className="w-8 h-8 mx-auto mb-3 opacity-30" />
+        <p className="text-sm font-medium">No open orders</p>
         <p className="text-xs mt-1">Place a limit order to see it here</p>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-term-border">
+    <div className="divide-y divide-border">
       {orders.map((order) => (
-        <div key={order.id} className="p-3 hover:bg-term-gray/30 transition-colors">
+        <div key={order.id} className="p-4 hover:bg-bg-elevated/50 transition-colors">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`px-1.5 py-0.5 text-xs font-medium ${
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className={`px-2 py-1 text-xs font-medium rounded ${
                   order.side === 'YES'
-                    ? 'bg-term-green/20 text-term-green'
-                    : 'bg-term-red/20 text-term-red'
+                    ? 'bg-accent-green/15 text-accent-green'
+                    : 'bg-accent-red/15 text-accent-red'
                 }`}>
-                  {order.side} {order.leverage}x LIMIT
+                  {order.side === 'YES' ? 'Long' : 'Short'} {order.leverage}x Limit
                 </span>
               </div>
-              <p className="text-sm text-term-text truncate">
+              <p className="text-sm text-text-primary truncate">
                 {order.marketQuestion}
               </p>
             </div>
@@ -257,22 +257,22 @@ function OrdersList() {
               variant="ghost"
               size="sm"
             >
-              CANCEL
+              Cancel
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-2 text-xs">
+          <div className="grid grid-cols-3 gap-4 mt-3 text-xs">
             <div>
-              <span className="text-term-text-dim">SIZE</span>
-              <p className="text-term-text">{formatPrice(order.size)}</p>
+              <span className="text-text-muted">Size</span>
+              <p className="font-mono text-text-primary">{formatPrice(order.size)}</p>
             </div>
             <div>
-              <span className="text-term-text-dim">LIMIT</span>
-              <p className="text-term-cyan">{formatCents(order.limitPrice)}</p>
+              <span className="text-text-muted">Limit Price</span>
+              <p className="font-mono text-accent-blue">{formatCents(order.limitPrice)}</p>
             </div>
             <div>
-              <span className="text-term-text-dim">MARGIN</span>
-              <p className="text-term-text">{formatPrice(order.margin)}</p>
+              <span className="text-text-muted">Margin</span>
+              <p className="font-mono text-text-primary">{formatPrice(order.margin)}</p>
             </div>
           </div>
         </div>
@@ -286,59 +286,59 @@ function TradeHistoryList() {
 
   if (tradeHistory.length === 0) {
     return (
-      <div className="p-8 text-center text-term-text-dim">
-        <History className="w-6 h-6 mx-auto mb-2 opacity-50" />
-        <p className="text-sm">&gt; NO_TRADE_HISTORY_</p>
+      <div className="p-8 text-center text-text-muted">
+        <History className="w-8 h-8 mx-auto mb-3 opacity-30" />
+        <p className="text-sm font-medium">No trade history</p>
         <p className="text-xs mt-1">Your closed trades will appear here</p>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-term-border">
+    <div className="divide-y divide-border">
       {tradeHistory.map((trade) => {
         const pnlFormatted = trade.pnl !== undefined ? formatPnL(trade.pnl) : null
 
         return (
-          <div key={trade.id} className="p-3 hover:bg-term-gray/30 transition-colors">
+          <div key={trade.id} className="p-4 hover:bg-bg-elevated/50 transition-colors">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-1.5 py-0.5 text-xs font-medium ${
-                    trade.type === 'OPEN' ? 'bg-term-cyan/20 text-term-cyan' : 'bg-term-gray text-term-text-dim'
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={`px-2 py-1 text-xs font-medium rounded ${
+                    trade.type === 'OPEN' ? 'bg-accent-blue/15 text-accent-blue' : 'bg-bg-elevated text-text-muted'
                   }`}>
                     {trade.type}
                   </span>
-                  <span className={`px-1.5 py-0.5 text-xs font-medium ${
+                  <span className={`px-2 py-1 text-xs font-medium rounded ${
                     trade.side === 'YES'
-                      ? 'bg-term-green/20 text-term-green'
-                      : 'bg-term-red/20 text-term-red'
+                      ? 'bg-accent-green/15 text-accent-green'
+                      : 'bg-accent-red/15 text-accent-red'
                   }`}>
-                    {trade.side} {trade.leverage}x
+                    {trade.side === 'YES' ? 'Long' : 'Short'} {trade.leverage}x
                   </span>
                 </div>
-                <p className="text-sm text-term-text truncate">
+                <p className="text-sm text-text-primary truncate">
                   {trade.marketQuestion}
                 </p>
               </div>
 
               {pnlFormatted && (
                 <div className="text-right">
-                  <p className={`text-base font-bold ${trade.pnl >= 0 ? 'text-term-green' : 'text-term-red'}`}>
+                  <p className={`text-lg font-mono font-semibold ${trade.pnl >= 0 ? 'text-accent-green' : 'text-accent-red'}`}>
                     {pnlFormatted.text}
                   </p>
-                  <p className={`text-xs ${trade.pnl >= 0 ? 'text-term-green' : 'text-term-red'}`}>
+                  <p className={`text-xs font-mono ${trade.pnl >= 0 ? 'text-accent-green' : 'text-accent-red'}`}>
                     {trade.roi >= 0 ? '+' : ''}{trade.roi?.toFixed(2)}%
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-between mt-2 text-xs text-term-text-dim">
-              <div className="flex items-center gap-4">
-                <span>SIZE: {formatPrice(trade.size)}</span>
-                {trade.entryPrice && <span>ENTRY: {formatCents(trade.entryPrice)}</span>}
-                {trade.exitPrice && <span>EXIT: {formatCents(trade.exitPrice)}</span>}
+            <div className="flex items-center justify-between mt-3 text-xs text-text-muted">
+              <div className="flex items-center gap-4 font-mono">
+                <span>Size: {formatPrice(trade.size)}</span>
+                {trade.entryPrice && <span>Entry: {formatCents(trade.entryPrice)}</span>}
+                {trade.exitPrice && <span>Exit: {formatCents(trade.exitPrice)}</span>}
               </div>
               <span>{formatTimeAgo(trade.timestamp)}</span>
             </div>

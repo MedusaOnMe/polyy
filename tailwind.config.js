@@ -7,53 +7,54 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Terminal blacks
-        'term-black': '#0a0a0a',
-        'term-dark': '#111111',
-        'term-gray': '#1a1a1a',
-        'term-border': '#2a2a2a',
-        // Phosphor green palette
-        'term-green': '#00ff41',
-        'term-green-dim': '#00cc33',
-        'term-green-dark': '#003300',
-        // Terminal amber for warnings/accents
-        'term-amber': '#ffb000',
-        'term-amber-dim': '#cc8800',
-        // Red for errors/shorts
-        'term-red': '#ff0040',
-        'term-red-dim': '#cc0033',
-        // Cyan for info
-        'term-cyan': '#00ffff',
-        // Text
-        'term-text': '#b0b0b0',
-        'term-text-dim': '#606060',
+        // Modern dark backgrounds
+        'bg-primary': '#0d1117',
+        'bg-secondary': '#161b22',
+        'bg-elevated': '#21262d',
+        'border': '#30363d',
+        'border-light': '#484f58',
+        // Accent colors
+        'accent-green': '#22c55e',
+        'accent-green-hover': '#16a34a',
+        'accent-red': '#ef4444',
+        'accent-red-hover': '#dc2626',
+        'accent-amber': '#f59e0b',
+        'accent-blue': '#3b82f6',
+        'accent-purple': '#8b5cf6',
+        // Text colors
+        'text-primary': '#f0f6fc',
+        'text-secondary': '#8b949e',
+        'text-muted': '#484f58',
       },
       fontFamily: {
-        mono: ['"IBM Plex Mono"', '"SF Mono"', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"SF Mono"', '"Fira Code"', 'monospace'],
+      },
+      borderRadius: {
+        'sm': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'xl': '12px',
+      },
+      boxShadow: {
+        'sm': '0 1px 2px rgba(0, 0, 0, 0.05)',
+        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       },
       animation: {
-        'blink': 'blink 1s step-end infinite',
-        'scanline': 'scanline 8s linear infinite',
-        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
-        'flicker': 'flicker 0.15s infinite',
+        'fade-in': 'fadeIn 0.3s ease-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
       },
       keyframes: {
-        'blink': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0' },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        'scanline': {
-          '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(100vh)' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.7' },
-        },
-        'flicker': {
-          '0%': { opacity: '0.97' },
-          '50%': { opacity: '1' },
-          '100%': { opacity: '0.98' },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

@@ -71,7 +71,7 @@ export function OrderEntry() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       const entryPrice = orderType === 'limit' ? parseFloat(limitPrice) || currentPrice : currentPrice
       openPosition(selectedMarket, side, sizeNum, leverage, entryPrice)
-      toast.success(`${side} position opened @ ${leverage}x`)
+      toast.success(`${side === 'YES' ? 'Long' : 'Short'} position opened @ ${leverage}x`)
       setSize('')
     } catch (err) {
       toast.error(err.message || 'Failed to open position')
@@ -82,71 +82,71 @@ export function OrderEntry() {
 
   if (!selectedMarket) {
     return (
-      <div className="bg-term-dark border border-term-border h-full flex items-center justify-center">
-        <div className="text-xs text-term-text-dim">
-          &gt; SELECT_MARKET_
+      <div className="bg-bg-secondary border border-border rounded-lg h-full flex items-center justify-center">
+        <div className="text-sm text-text-muted">
+          Select a market to trade
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-term-dark border border-term-border overflow-hidden h-full flex flex-col">
+    <div className="bg-bg-secondary border border-border rounded-lg overflow-hidden h-full flex flex-col">
       {/* Side selector */}
       <div className="grid grid-cols-2">
         <button
           onClick={() => setSide('YES')}
-          className={`py-3 text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-3 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
             side === 'YES'
-              ? 'bg-white text-black'
-              : 'bg-term-dark text-term-text-dim hover:text-term-text border-b border-term-border'
+              ? 'bg-accent-green text-white'
+              : 'bg-bg-elevated text-text-secondary hover:text-text-primary border-b border-border'
           }`}
         >
           <ArrowUp className="w-4 h-4" />
-          LONG
+          Long
         </button>
         <button
           onClick={() => setSide('NO')}
-          className={`py-3 text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-3 text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
             side === 'NO'
-              ? 'bg-white text-black'
-              : 'bg-term-dark text-term-text-dim hover:text-term-text border-b border-term-border'
+              ? 'bg-accent-red text-white'
+              : 'bg-bg-elevated text-text-secondary hover:text-text-primary border-b border-border'
           }`}
         >
           <ArrowDown className="w-4 h-4" />
-          SHORT
+          Short
         </button>
       </div>
 
-      <div className="p-3 space-y-3 flex-1 overflow-auto">
-        {/* Order type */}
-        <div className="flex gap-1">
+      <div className="p-4 space-y-4 flex-1 overflow-auto">
+        {/* Order type tabs */}
+        <div className="flex gap-1 p-1 bg-bg-primary rounded-lg">
           <button
             onClick={() => setOrderType('market')}
-            className={`flex-1 py-2 text-xs font-medium transition-all border ${
+            className={`flex-1 py-2 text-sm font-medium transition-all rounded-md ${
               orderType === 'market'
-                ? 'bg-white text-black border-white'
-                : 'text-term-text-dim bg-term-dark hover:text-term-text border-term-border'
+                ? 'bg-bg-elevated text-text-primary'
+                : 'text-text-muted hover:text-text-secondary'
             }`}
           >
-            MARKET
+            Market
           </button>
           <button
             onClick={() => setOrderType('limit')}
-            className={`flex-1 py-2 text-xs font-medium transition-all border ${
+            className={`flex-1 py-2 text-sm font-medium transition-all rounded-md ${
               orderType === 'limit'
-                ? 'bg-white text-black border-white'
-                : 'text-term-text-dim bg-term-dark hover:text-term-text border-term-border'
+                ? 'bg-bg-elevated text-text-primary'
+                : 'text-text-muted hover:text-text-secondary'
             }`}
           >
-            LIMIT
+            Limit
           </button>
         </div>
 
         {/* Limit price input */}
         {orderType === 'limit' && (
           <div>
-            <label className="block text-xs text-term-text-dim uppercase mb-1">
+            <label className="block text-xs text-text-muted uppercase tracking-wide mb-2">
               Limit Price
             </label>
             <input
@@ -157,33 +157,33 @@ export function OrderEntry() {
               step="0.01"
               min="0.01"
               max="0.99"
-              className="w-full bg-term-black border border-term-border px-3 py-2 text-sm text-term-text placeholder:text-term-text-dim"
+              className="w-full bg-bg-primary border border-border rounded-lg px-4 py-3 text-sm font-mono text-text-primary placeholder:text-text-muted"
             />
           </div>
         )}
 
         {/* Size input */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-xs text-term-text-dim uppercase">Size (USD)</label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs text-text-muted uppercase tracking-wide">Size (USD)</label>
             {isAuthenticated && (
-              <span className="text-xs text-term-text-dim">
-                BAL: <span className="text-term-text">{formatPrice(user?.balance)}</span>
+              <span className="text-xs text-text-muted">
+                Balance: <span className="font-mono text-text-secondary">{formatPrice(user?.balance)}</span>
               </span>
             )}
           </div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-term-text-dim text-sm">$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-sm">$</span>
             <input
               type="number"
               value={size}
               onChange={(e) => setSize(e.target.value)}
               placeholder="0.00"
-              className="w-full bg-term-black border border-term-border pl-6 pr-3 py-2 text-sm text-term-text placeholder:text-term-text-dim"
+              className="w-full bg-bg-primary border border-border rounded-lg pl-8 pr-4 py-3 text-sm font-mono text-text-primary placeholder:text-text-muted"
             />
           </div>
           {/* Quick amount buttons */}
-          <div className="flex gap-1 mt-1.5">
+          <div className="flex gap-2 mt-2">
             {[25, 50, 75, 100].map((pct) => (
               <button
                 key={pct}
@@ -193,7 +193,7 @@ export function OrderEntry() {
                   }
                 }}
                 disabled={!isAuthenticated}
-                className="flex-1 py-1 text-xs text-term-text-dim hover:text-term-green hover:bg-term-green/10 transition-colors disabled:opacity-30"
+                className="flex-1 py-1.5 text-xs font-medium text-text-muted hover:text-text-primary bg-bg-primary hover:bg-bg-elevated rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {pct}%
               </button>
@@ -205,46 +205,46 @@ export function OrderEntry() {
         <LeverageSlider value={leverage} onChange={setLeverage} />
 
         {/* Calculations */}
-        <div className="space-y-1.5 pt-2 border-t border-term-border">
-          <div className="flex justify-between text-xs">
-            <span className="text-term-text-dim">ENTRY</span>
-            <span className="text-term-text">
+        <div className="space-y-2 pt-3 border-t border-border">
+          <div className="flex justify-between text-sm">
+            <span className="text-text-muted">Entry Price</span>
+            <span className="font-mono text-text-primary">
               {formatCents(orderType === 'limit' && limitPrice ? parseFloat(limitPrice) : currentPrice)}
             </span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-term-text-dim">MARGIN</span>
-            <span className="text-term-text">{formatPrice(calculations.margin)}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-muted">Margin Required</span>
+            <span className="font-mono text-text-primary">{formatPrice(calculations.margin)}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-term-text-dim">SHARES</span>
-            <span className="text-term-text">{calculations.shares.toFixed(2)}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-muted">Est. Shares</span>
+            <span className="font-mono text-text-primary">{calculations.shares.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-term-text-dim">PROFIT</span>
-            <span className="text-term-green">
+          <div className="flex justify-between text-sm">
+            <span className="text-text-muted">Max Profit</span>
+            <span className="font-mono text-accent-green">
               +{formatPrice(calculations.potentialProfit)} ({calculations.roi.toFixed(1)}%)
             </span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-term-text-dim">FEE</span>
-            <span className="text-term-text">{formatPrice(calculations.fee)}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-muted">Trading Fee</span>
+            <span className="font-mono text-text-primary">{formatPrice(calculations.fee)}</span>
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-term-amber flex items-center gap-1">
-              <AlertTriangle className="w-3 h-3" />
-              LIQ_PRICE
+          <div className="flex justify-between text-sm">
+            <span className="text-accent-amber flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Liquidation
             </span>
-            <span className="text-term-red">{formatCents(calculations.liquidationPrice)}</span>
+            <span className="font-mono text-accent-red">{formatCents(calculations.liquidationPrice)}</span>
           </div>
         </div>
 
         {/* Warning for high leverage */}
         {leverage >= 20 && (
-          <div className="flex items-start gap-2 p-2 border border-term-amber/30 bg-term-amber/5">
-            <AlertTriangle className="w-3 h-3 text-term-amber flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-term-amber">
-              HIGH LEVERAGE - LIQUIDATION RISK
+          <div className="flex items-start gap-3 p-3 bg-accent-amber/10 border border-accent-amber/30 rounded-lg">
+            <AlertTriangle className="w-4 h-4 text-accent-amber flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-accent-amber">
+              High leverage increases liquidation risk. Trade carefully.
             </p>
           </div>
         )}
@@ -253,22 +253,25 @@ export function OrderEntry() {
         <button
           onClick={handleSubmit}
           disabled={loading || !size || parseFloat(size) <= 0}
-          className={`w-full py-2.5 text-sm font-medium transition-colors disabled:opacity-30 ${
+          className={`w-full py-3 text-sm font-semibold rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
             side === 'YES'
-              ? 'border border-term-green text-term-green hover:bg-term-green hover:text-term-black'
-              : 'border border-term-red text-term-red hover:bg-term-red hover:text-term-black'
+              ? 'bg-accent-green hover:bg-accent-green-hover text-white'
+              : 'bg-accent-red hover:bg-accent-red-hover text-white'
           }`}
         >
           {loading ? (
-            <span className="loading-dots">EXECUTING</span>
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Executing...
+            </div>
           ) : (
-            `> ${side === 'YES' ? 'LONG' : 'SHORT'} @ ${leverage}x`
+            `Open ${side === 'YES' ? 'Long' : 'Short'} @ ${leverage}x`
           )}
         </button>
 
         {!isAuthenticated && (
-          <p className="text-xs text-term-text-dim text-center">
-            &gt; CONNECT_WALLET
+          <p className="text-xs text-text-muted text-center">
+            Connect your wallet to start trading
           </p>
         )}
       </div>
